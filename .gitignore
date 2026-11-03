@@ -1,0 +1,15 @@
+node_modules/
+.npm-cache/
+dist/
+artifacts/
+release/
+.electron-cache/
+userdata/
+*.log
+tests/
+screenshots/
+coverage/
+.env
+.env.*
+*.pem
+*.key

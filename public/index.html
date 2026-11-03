@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'">
+  <title>背闪训练器 · Flash Dodger</title>
+  <link rel="icon" href="./favicon.svg"><link rel="stylesheet" href="./style.css">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M10 7h23L22 18h10L11 34l5-16H7z"/></svg><div><strong>背闪训练器</strong><span>FLASH DODGER</span></div></div>
+    <nav aria-label="主要导航"><button class="nav-button active" id="home-button">训练场</button><button class="nav-button" id="library-button">技能档案 <span>12</span></button><button class="nav-button" id="help-button">操作与校准</button></nav>
+    <div class="local-state"><i></i>本地运行 <span class="version">v0.9 · 国际服 PC / 13.09</span></div>
+  </header>
+  <div class="workspace">
+    <aside class="sidebar">
+      <div class="section-heading"><span>训练对手</span><span id="agent-count" class="muted">08 AGENTS</span></div>
+      <div class="filter-tabs"><button class="selected" data-filter="flash">闪光技能</button><button data-filter="near">近视专项</button></div>
+      <div class="agent-grid" id="agents"></div>
+      <label class="toggle-row"><span>混合随机闪光 <small>随机特工与投法</small></span><input type="checkbox" id="random"><i class="switch"></i></label>
+      <section class="ability-card"><div class="ability-heading"><span id="ability-name">Flashbulb</span><span id="ability-tag"></span></div><p id="ability-description"></p><label class="field-label" for="variant">投法 / 机制</label><select id="variant"></select><p class="counter" id="counter"></p><div class="timing"><span><span id="windup-label">引信</span><b id="windup">1.15 s</b></span><span><span id="duration-label">正面最大时长</span><b id="duration">1.50 s</b></span></div><div id="timing-evidence" class="timing-evidence"></div><button class="text-button" id="measurement-button">实测校准与来源 ↗</button><div id="hush-tuning"><details><summary>Hush 模拟参数 · 待实测</summary><div class="pair"><label>引信 / 秒<input id="hushFuse" type="number" min="0.3" max="3" step="0.05"></label><label>满闪 / 秒<input id="hushDuration" type="number" min="0.5" max="4" step="0.05"></label></div><small>13.09 公告说明了机制，未列出这两个时长。当前是可调训练值。</small></details></div></section>
+      <section class="sensitivity-card"><div class="section-heading"><span>你的灵敏度</span><span class="match-tag">VALORANT</span></div><div class="pair"><label for="sensitivity">游戏灵敏度<input id="sensitivity" type="number" min="0.001" max="10" step="0.001"></label><label for="dpi">鼠标 DPI<input id="dpi" type="number" min="100" max="32000" step="50"></label></div><div class="sens-meta"><span><b id="edpi">280</b> eDPI</span><span><b id="cm360">46.65</b> cm / 360°</span></div><button class="text-button" id="calibrate-button">校准转身距离 <span>↗</span></button></section>
+      <div class="sidebar-footer"><span class="save-dot"></span><span id="save-status">设置保存在本机</span><span>离线可用</span></div>
+    </aside>
+    <main>
+      <div class="main-heading"><div><div class="eyebrow">REACTION TRAINING / 01</div><h1>看见，转身，再拉回。</h1></div><div class="heading-actions"><button class="outline-button" id="reset-button" title="重开本组训练">重新训练</button><button class="icon-button" id="fullscreen-button" title="切换训练全屏" aria-label="切换训练全屏"><svg viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button></div></div>
+      <div class="mode-row"><div class="segmented" id="modes"><button data-mode="stationary" class="selected">原地背闪</button><button data-mode="roam">自由移动</button><button data-mode="corner">行进过点</button></div><span id="mode-description">专注视角反应，固定站位</span></div>
+      <div id="stage-frame"><div class="viewport" id="viewport">
+        <div class="stage-top"><span class="stage-map"><i></i><span id="map-name">L 型拐角</span><small id="stage-state">准备就绪</small></span><div class="performance"><span id="input-state">等待鼠标捕获</span><span id="fps">— FPS</span></div></div>
+        <div class="crosshair" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div id="coach-cue" hidden></div><div id="hit-marker" hidden>×</div>
+        <div class="flash-effect" id="flash-effect"></div><div class="plasma-effect" id="plasma-effect"></div><div class="near-effect" id="near-effect"></div>
+        <div class="result-toast" id="result-toast" hidden><strong></strong><span></span></div>
+        <div class="stage-bottom"><div><span class="hud-title" id="hud-agent">HUSH / FLASHBULB</span><span id="hud-hint">鼠标转向 · Esc 暂停</span></div><div class="hud-round"><b id="round-number">00</b><span>/ <span id="round-total">20</span><small>本组次数</small></span></div></div>
+        <div class="start-overlay" id="start-overlay"><div class="start-card"><span class="start-kicker" id="overlay-kicker">准备好你的下一次反应</span><h2 id="overlay-title">背身，躲过这一闪。</h2><p id="overlay-description">识别技能出手，快速转身。<br>闪光爆开后，把准星拉回原位。</p><button class="primary-button" id="start-button">开始训练 <span>→</span></button><div class="start-keys"><kbd>鼠标</kbd> 转向 <kbd>Esc</kbd> 暂停 <kbd>左键</kbd> 打技能</div></div></div>
+        <div class="fatal-overlay" id="fatal-error" hidden></div>
+      </div></div>
+      <div class="under-stage"><span><kbd>W A S D</kbd> 移动 <kbd>Shift</kbd> 静步 <kbd>Ctrl</kbd> 蹲下 <kbd>R</kbd> 回到起点</span><span>103° FOV <i>·</i> 16:9 <i>·</i> 原创训练场</span></div>
+      <div class="training-grid">
+        <section class="panel arena-panel"><div class="section-heading"><span>训练场地</span><button class="text-button" id="edit-map-button">编辑掩体 ↗</button></div><div class="map-options" id="map-options"></div></section>
+        <section class="panel routine-panel"><div class="section-heading"><span>训练节奏</span><span class="muted">SESSION</span></div><div class="routine-fields"><label>每组次数<select id="rounds"><option value="10">10 次</option><option value="20">20 次</option><option value="50">50 次</option><option value="100">100 次</option></select></label><label>最短间隔<select id="interval"><option value="1.5">1.5 秒</option><option value="2.5">2.5 秒</option><option value="4">4 秒</option><option value="6">6 秒</option></select></label></div><div class="routine-fields"><label>来闪方向<select id="side"><option value="random">随机左右</option><option value="left">左侧</option><option value="right">右侧</option></select></label><label class="check-label"><input type="checkbox" id="coach">辅助提示<small>显示剩余引信</small></label></div></section>
+        <section class="panel score-panel"><div class="section-heading"><span>本组表现</span><button class="text-button" id="export-button">导出 CSV ↗</button></div><div class="score-grid"><div><b id="success-rate">—<small>%</small></b><span>有效规避</span></div><div><b id="reaction-stat">—<small>ms</small></b><span>平均反应</span></div><div><b id="return-stat">—<small>ms</small></b><span>爆后回正</span></div></div><div id="session-dots" class="session-dots"></div><small class="score-note">反应从技能首次可见起计；近视与击毁单独记录。</small></section>
+      </div>
+      <section class="history-panel"><div class="section-heading"><span>最近训练</span><span id="history-summary" class="muted">等待第一轮闪光</span></div><div class="history-table"><table><thead><tr><th>次数</th><th>技能</th><th>结果</th><th>反应</th><th>爆点夹角</th><th>致盲时长</th><th>回正</th></tr></thead><tbody id="history"><tr class="empty-row"><td colspan="7">训练结束后，这里会记录每一次转身。</td></tr></tbody></table></div></section>
+      <footer class="main-footer"><span>独立训练工具 · 非 Riot 官方产品</span><button class="text-button" id="accuracy-button">资料查阅于 2026.11.02 · 含待实测参数 ↗</button></footer>
+    </main>
+  </div>
+  <dialog id="library-dialog"><div class="dialog-heading"><div><span class="eyebrow">ABILITY INDEX</span><h2>技能档案与模拟边界</h2></div><button class="close-button" aria-label="关闭">×</button></div><p class="dialog-intro">国际服 PC · 参考版本 13.09。每个时序字段单列来源；官方公告值不代表整个技能已逐帧复现。</p><div class="notice">未导入实测表时，角度与距离衰减仍使用训练近似。Hush 时长、部分部署时间、轨迹、音效、移动与射击手感仍待校准。用户校准数据不等于官方确认。训练中的 100° 成功阈值是评分规则。</div><div id="ability-library"></div><h3>资料来源</h3><div id="sources"></div></dialog>
+  <dialog id="measurement-dialog"><div class="dialog-heading"><div><span class="eyebrow">MEASUREMENT</span><h2 id="measurement-title">技能实测校准</h2></div><button class="close-button" aria-label="关闭">×</button></div>
+    <p class="dialog-intro">国际服 PC · 13.09。用同版本自定义房录像逐帧测量；填写来源后应用到当前投法。原始默认值可随时恢复。</p>
+    <div id="measurement-sources" class="notice"></div>
+    <div class="measurement-grid"><label><span id="measurement-windup-label">前摇 / 秒</span><input id="measurement-windup" type="number" min="0.001" max="5" step="0.001"></label><label><span id="measurement-duration-label">时长 / 秒</span><input id="measurement-duration" type="number" min="0.001" max="5" step="0.001"></label><label id="measurement-flight-field">激活前飞行 / 秒<input id="measurement-flight" type="number" min="0.001" max="2" step="0.001"></label></div>
+    <label class="field-label" for="measurement-reference">测量来源</label><input id="measurement-reference" maxlength="500" placeholder="录像文件名、版本、帧率、取帧位置、重复次数">
+    <details class="measurement-details"><summary>逐帧换算</summary><div class="measurement-grid"><label>录像帧率<input id="measure-fps" type="number" value="240" min="1" max="1000" step="0.001"></label><label>起始帧<input id="measure-start" type="number" value="0" min="0" step="1"></label><label>终止帧<input id="measure-end" type="number" value="144" min="1" step="1"></label></div><p id="measurement-conversion"></p></details>
+    <details class="measurement-details"><summary>角度与距离衰减实测表（可选）</summary><p>每行：角度（度）, 距离（米）, 致盲总时长（秒）。每个距离都需包含 0° 和 180°，且各距离使用相同角度网格。留空则保留近似曲线。采样范围内插值，超出距离范围会标记并回退近似。</p><textarea id="measurement-samples" rows="6" spellcheck="false" placeholder="填入你实际测得的数值，每行三个数字，用逗号分隔。"></textarea><p class="muted">测量时固定爆点高度和投法，统一“引爆帧至画面完全恢复”的口径；画面渐隐形状仍是近似。</p></details>
+    <p id="measurement-error" role="alert"></p><div class="dialog-actions measurement-actions"><button class="outline-button" id="measurement-restore">恢复当前投法默认值</button><button class="outline-button" id="measurement-export">导出校准文件</button><button class="outline-button" id="measurement-import">导入并应用</button><button class="primary-button" id="measurement-apply">应用校准</button></div><input id="measurement-file" type="file" accept=".json,application/json" hidden>
+  </dialog>
+  <dialog id="help-dialog"><div class="dialog-heading"><div><span class="eyebrow">INPUT & CALIBRATION</span><h2>把手感带到训练场</h2></div><button class="close-button" aria-label="关闭">×</button></div><div class="help-grid"><section><h3>当前灵敏度</h3><p id="calibration-summary"></p><p>角度按「鼠标增量 × 0.07 × 游戏灵敏度」计算。DPI 仅用于显示物理距离，不会再次乘进视角速度。保持鼠标硬件 DPI 与游戏一致。</p><label class="field-label">距离校准倍率<input id="calibration" type="number" min="0.5" max="2" step="0.001"></label><p class="muted">默认 1.000。标出鼠标起点，按理论半圈距离移动，检查是否刚好转身 180°。如果实际转过 A 度，新倍率 = 当前倍率 × 180 / A。</p><button class="outline-button" id="calibration-run">进入 180° 校准</button><p id="calibration-reading">校准时不出闪，按 Esc 返回。</p></section><section><h3>训练操作</h3><dl class="key-guide"><dt>鼠标</dt><dd>转向，优先使用原始输入</dd><dt>W A S D</dt><dd>行走（原地模式禁用位移）</dd><dt>Shift / Ctrl</dt><dd>静步 / 蹲下</dd><dt>左键</dt><dd>射击可破坏的技能</dd><dt>Esc</dt><dd>暂停并释放鼠标</dd><dt>R</dt><dd>回到起点，取消当前未完成轮次</dd><dt>F11</dt><dd>切换应用全屏</dd></dl><h3>画面与声音</h3><label class="slider-label">闪屏亮度 <input id="brightness" type="range" min="0.1" max="1" step="0.05"></label><label class="slider-label">提示音量 <input id="volume" type="range" min="0" max="1" step="0.05"></label><p class="muted">亮度仅改变显示效果，不改变计分。提示音为原创合成音，尚未匹配官方音效。</p></section></div><div class="notice" id="system-info">正在检测图形环境…</div></dialog>
+  <dialog id="map-dialog"><div class="dialog-heading"><div><span class="eyebrow">RANGE EDITOR</span><h2>摆放你的掩体</h2></div><button class="close-button" aria-label="关闭">×</button></div><p>点击空白网格放置一个 2 × 2 米箱体，再次点击移除。灰色为场地原有墙体，绿色为自定义掩体，出生点与行进触发点保持畅通。</p><canvas id="map-editor" width="560" height="560" aria-label="训练场俯视掩体编辑器"></canvas><div class="dialog-actions"><button class="outline-button" id="clear-custom">清空自定义箱体</button><span id="custom-count">0 个自定义掩体</span><button class="primary-button" id="apply-map">应用场地</button></div></dialog>
+  <div id="notification" role="status" hidden></div>
+  <script type="module" src="./src/app.js"></script>
+</body></html>
