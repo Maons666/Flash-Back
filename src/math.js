@@ -50,7 +50,7 @@ export function movePlayer(position,delta,boxes,radius=.28) {
   for(let s=0;s<steps;s++) for(const axis of [0,2]) {
     const next=[...result]; next[axis]+=delta[axis]/steps;
     const blocked=boxes.some(b=>b.max[1]>.2 && next[0]>b.min[0]-radius&&next[0]<b.max[0]+radius&&next[2]>b.min[2]-radius&&next[2]<b.max[2]+radius);
-    if(!blocked)result[axis]=clamp(next[axis],-13.6,13.6);
+    if(!blocked)result[axis]=clamp(next[axis],axis===0?-23.7:-35.7,axis===0?23.7:15.7);
   }
   return result;
 }

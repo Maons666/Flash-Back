@@ -1,3 +1,6 @@
+import { OFFICIAL_ASSETS } from './official-assets.js';
+import { TechniquePreview } from './preview.js';
+import { motionFor } from './trajectories.js';
 import { AGENTS, FLASH_AGENTS, DEFAULTS, SOURCES, getAgent, timingEvidence, PATCH } from './data.js';
 import { resolveTiming, sanitizeProfiles, validateProfile, profileKey, framesToSeconds, skyeDuration } from './accuracy.js';
 import { Trainer } from './engine.js';
@@ -12,7 +15,7 @@ const settings={...DEFAULTS,...load(settingsKey,{})};
 settings.calibrations=sanitizeProfiles(settings.calibrations);
 const numericLimits={sensitivity:[.001,10],dpi:[100,32000],calibration:[.5,2],interval:[1.5,6],rounds:[10,100],brightness:[.1,1],volume:[0,1],hushFuse:[.3,3],hushDuration:[.5,4]};
 for(const [key,[min,max]] of Object.entries(numericLimits))settings[key]=Number.isFinite(Number(settings[key]))?clamp(Number(settings[key]),min,max):DEFAULTS[key];
-for(const key of ['random','coach','raw'])settings[key]=settings[key]===true;
+for(const key of ['random','mixVariants','coach','raw'])settings[key]=settings[key]===true;
 settings.agent=getAgent(settings.agent).id;
 if(!['stationary','roam','corner'].includes(settings.mode))settings.mode='stationary';
 if(!MAPS.some(m=>m.id===settings.arena))settings.arena='corner';
@@ -35,7 +38,7 @@ function resetSession(){
 function renderAgents(){
   const list=AGENTS.filter(a=>(a.kind==='nearsight')===(filter==='near'));
   $('agent-count').textContent=`${String(list.length).padStart(2,'0')} AGENTS`;
-  $('agents').innerHTML=list.map(a=>`<button class="agent-button ${settings.agent===a.id?'selected':''}" data-agent="${a.id}" style="--agent:${a.color}" title="${a.zh} · ${a.skill}" aria-pressed="${settings.agent===a.id}"><span class="agent-symbol">${icon(a.id)}</span><span class="agent-label">${a.name}</span></button>`).join('');
+  $('agents').innerHTML=list.map(a=>`<button class="agent-button ${settings.agent===a.id?'selected':''}" data-agent="${a.id}" style="--agent:${a.color}" title="${a.zh} · ${a.skill}" aria-pressed="${settings.agent===a.id}"><span class="agent-symbol">${OFFICIAL_ASSETS[a.id]?.portrait?`<img class="agent-portrait" src="./${OFFICIAL_ASSETS[a.id].portrait}" alt="${a.name}">`:icon(a.id)}</span><span class="agent-label">${a.name}</span></button>`).join('');
   document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('selected',b.dataset.filter===filter));
 }
 function renderAbility(){
@@ -43,6 +46,8 @@ function renderAbility(){
   $('ability-name').textContent=a.skill;$('ability-tag').textContent=a.tag?`V${a.tag}`:a.kind==='nearsight'?'近视':a.kind==='plasma'?'电浆':'FLASH';
   $('ability-description').textContent=a.description;$('counter').textContent=a.counter;
   $('variant').innerHTML=a.variants.map(v=>`<option value="${v.id}">${v.name}</option>`).join('');$('variant').value=settings.variant;
+  const skill=OFFICIAL_ASSETS[a.id]?.abilities?.find(s=>s.key===(v.id==='clone'?'clone':a.id==='harbor'&&(v.mechanic||v.id)==='wave'?'wave':'flash'));
+  $('ability-icon').hidden=!skill;if(skill)$('ability-icon').src='./'+skill.icon;
   const timing=resolveTiming(a,v,settings),labels=timingLabels(a,v);
   $('windup-label').textContent=labels[0];$('duration-label').textContent=labels[1];
   $('windup').textContent=timing.windup.toFixed(3)+' s';$('duration').textContent=timing.duration.toFixed(3)+' s';
@@ -179,6 +184,10 @@ function fillMeasurements(){
   $('measurement-windup-label').textContent=`${labels[0]} / 秒`;$('measurement-duration-label').textContent=`${labels[1]} / 秒`;
   $('measurement-windup').value=t.windup;$('measurement-duration').value=t.duration;$('measurement-flight').value=t.flightTime??1;
   $('measurement-flight-field').hidden=a.id!=='skye';
+  const supported=['kayo','skye','yoru','hush','gekko'].includes(a.id),motion=motionFor(a,v,t.profile);
+  $('measurement-motion').hidden=!supported;
+  for(const key of ['speed','gravity','restitution'])$('motion-'+key).value=motion[key];
+  $('motion-gravity').disabled=a.id==='skye';$('motion-restitution').disabled=a.id==='skye';
   $('measurement-reference').value=t.profile?.reference??'';
   $('measurement-samples').value=t.profile?.samples.map(s=>`${s.angle}, ${s.distance}, ${s.duration}`).join('\n')??'';
   $('measurement-samples').disabled=a.kind!=='flash';
@@ -200,7 +209,8 @@ function readMeasurementForm(){
     const cells=line.trim().split(/[,，]/);if(cells.length!==3||cells.some(c=>!c.trim()))throw new Error('每行需要三个已测数值，用逗号分隔。');
     return {angle:Number(cells[0]),distance:Number(cells[1]),duration:Number(cells[2])};
   }):[];
-  return validateProfile({schema:1,platform:'pc-global',patch:PATCH,agent:a.id,variant:settings.variant,reference:$('measurement-reference').value,timing,samples});
+  const motion=['kayo','skye','yoru','hush','gekko'].includes(a.id)?Object.fromEntries(['speed','gravity','restitution'].map(key=>[key,Number($('motion-'+key).value)])):undefined;
+  return validateProfile({schema:1,platform:'pc-global',patch:PATCH,agent:a.id,variant:settings.variant,reference:$('measurement-reference').value,timing,samples,...(motion?{motion}:{})});
 }
 function applyProfile(profile){
   settings.calibrations[profileKey(profile.agent,profile.variant)]=profile;settings.agent=profile.agent;settings.variant=profile.variant;
@@ -258,10 +268,11 @@ function renderHud(){
   else if(settings.coach&&t)$('coach-cue').textContent=Number.isFinite(t.fuse)?`引爆倒计时 ${Math.max(0,t.fuse-t.age).toFixed(2)} s`:'锁定 / 追踪机制';
   $('hit-marker').hidden=game.time>hitUntil;
   const remaining=e?Math.max(0,e.until-game.time):0,fade=e&&e.duration>0?Math.min(1,remaining/Math.min(e.duration*.45,.7)):0;
-  $('flash-effect').style.opacity=e?.type==='flash'?String(fade*settings.brightness):'0';
-  $('plasma-effect').style.opacity=e?.type==='plasma'?String(fade):'0';
+  $('flash-effect').style.opacity='0';
+  $('plasma-effect').style.opacity='0';
   $('near-effect').style.opacity=e?.type==='near'?'.8':'0';
 }
+new TechniquePreview(settings);
 renderSettings();updateStats();updateOverlay();
 let previous=performance.now();
 function advanceTo(now){
@@ -271,7 +282,7 @@ function advanceTo(now){
   game.update(dt);
 }
 function frame(now){
-  advanceTo(now);scene?.render();if(game.running)game.markPresented();frames++;
+  advanceTo(now);audio.update(game);scene?.render();if(game.running)game.markPresented();frames++;
   renderHud();
   if(now-lastFps>=1000){$('fps').textContent=`${Math.round(frames*1000/(now-lastFps))} FPS`;frames=0;lastFps=now;}
   requestAnimationFrame(frame);

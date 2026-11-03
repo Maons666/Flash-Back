@@ -1,6 +1,6 @@
 export const VERIFIED_DATE = '2026-11-02';
 export const PATCH = '13.09';
-export const SIMULATION_REVISION = '0.9.0';
+export const SIMULATION_REVISION = '0.10.0';
 const official = slug => `https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-${slug}/`;
 export const SOURCES = [
   { title:'13.09 · Hush 的转向、触碰与延时引爆机制', url:official('1309') },
@@ -13,7 +13,9 @@ export const SOURCES = [
   { title:'官方特工名册与技能机制', url:'https://playvalorant.com/en-us/agents/' },
   { title:'1.07 · Breach 显现后的 0.5 秒引爆前摇', url:official('1-07') },
   { title:'2.06 · Yoru 反弹后的 0.6 秒激活时间', url:official('2-06') },
-  { title:'3.06 · Skye 激活后另有 0.3 秒引爆前摇', url:official('3-06') },
+  { title:'3.06 · Skye 激活前摇、KAY/O 末段提示与飞行声音', url:official('3-06') },
+  { title:'社区参考 · Skye 飞行速度，非 Riot 官方参数', url:'https://wiki.playvalorant.com/en-us/Guiding_Light' },
+  { title:'社区参考 · 投射物速度与重力分类，换算仍待实测', url:'https://wiki.playvalorant.com/en-us/Projectile' },
   { title:'7.04 / 8.01 · Skye 最长飞行 2 秒、到时自动激活', url:official('8-01') },
   { title:'7.04 · Skye 最长飞行时间', url:official('7-04') },
   { title:'9.08 · Dizzy 形成后的有效活动时间为 1 秒', url:official('9-08') },
@@ -62,9 +64,26 @@ export const AGENTS = [
     description:'涡流在范围内造成近视和减速，现版本无需视线；大招水浪命中也不受背身影响。',counter:'离开地面范围或横移避开水浪。',
     variants:[{id:'surge',name:'涡流爆发',windup:.6,duration:2},{id:'wave',name:'清算水浪',windup:.7,duration:3}] },
 ];
+// Techniques share the ability's mechanics, with different real launch geometry.
+const technique=(id,name,base,extra={})=>({...base,id,name,mechanic:base.mechanic||base.id,...extra});
+const a=id=>AGENTS.find(a=>a.id===id);
+a('phoenix').variants.push(technique('high','高位曲闪',a('phoenix').variants[1],{height:3.2}),technique('reverse','反向出角闪',a('phoenix').variants[0]));
+a('breach').variants.push(technique('high','墙面高闪',a('breach').variants[0],{height:3}),technique('low','贴地墙闪',a('breach').variants[0],{height:.5}),technique('offangle','侧墙错位闪',a('breach').variants[0]));
+a('skye').variants[0].name='直飞蓄力鸟';a('skye').variants[2].route='sweep';
+a('skye').variants.push(technique('curve','绕角转弯鸟',a('skye').variants[0],{route:'curve'}),technique('dive','高位下压鸟',a('skye').variants[0],{route:'dive'}),technique('sweep','横向回转鸟',a('skye').variants[0],{route:'sweep'}));
+a('kayo').variants[1].name='近距离低抛';a('kayo').variants[2].name='真实墙面反弹';
+a('kayo').variants.push(technique('sky','高空越掩体闪',a('kayo').variants[0],{pitch:22}),technique('ground','前压地弹闪',a('kayo').variants[0],{pitch:-12}),technique('cross','横向错位长抛',a('kayo').variants[0],{pitch:8}));
+a('yoru').variants.push(technique('ground','近点地弹闪',a('yoru').variants[0]),technique('high','高位墙弹闪',a('yoru').variants[0]));
+a('vyse').variants.push(technique('high','高位玫瑰',a('vyse').variants[0],{height:3}),technique('offangle','侧墙玫瑰',a('vyse').variants[0]),technique('delayed','预置延迟激活',a('vyse').variants[0]));
+a('gekko').variants.push(technique('high','越掩体高抛',a('gekko').variants[0]),technique('bank','弹墙部署',a('gekko').variants[0]));
+a('hush').variants.push(technique('late','延后转向出闪',a('hush').variants[0]),technique('high','高位转向下压',a('hush').variants[0]));
+a('reyna').variants.push(technique('high','高位魔眼',a('reyna').variants[0]),technique('low','低位魔眼',a('reyna').variants[0]));
+a('omen').variants.push(technique('cross','侧向穿墙暗魇',a('omen').variants[0]));
+a('fade').variants.push(technique('cross','侧翼黯兽',a('fade').variants[0]));
+a('harbor').variants.push(technique('surge-lead','前方落点涡流',a('harbor').variants[0]));
 export const FLASH_AGENTS = AGENTS.filter(a => a.kind !== 'nearsight');
 export const getAgent = id => AGENTS.find(a => a.id === id) || AGENTS[0];
-export const DEFAULTS = { agent:'hush', variant:'redirect', mode:'stationary', arena:'corner', side:'random', sensitivity:.175, dpi:1600, calibration:1, interval:2.5, rounds:20, brightness:.75, volume:.35, random:false, coach:false, raw:true, custom:[], hushFuse:1.15, hushDuration:1.5, calibrations:{} };
+export const DEFAULTS = { agent:'hush', variant:'redirect', mode:'stationary', arena:'corner', side:'random', sensitivity:.175, dpi:1600, calibration:1, interval:2.5, rounds:20, brightness:.75, volume:.35, random:false, mixVariants:false, coach:false, raw:true, custom:[], hushFuse:1.15, hushDuration:1.5, calibrations:{} };
 
 // Evidence is attached to each field, not to the whole simulated ability.
 const evidence=(status,note,patch)=>({status,note,url:patch?official(patch):null});
@@ -83,7 +102,7 @@ export function timingEvidence(agent,variant) {
     reyna:[confirmed('眼球到位后的生效前摇','5-07'),evidence('derived','公告为 2 秒存续；本实现按包含前摇解释，生效窗口 1.6 秒，取帧口径待实测','5-07')],
     omen:[pending('发射前摇待实测'),pending('近视持续时间待实测')],
     fade:[pending('追踪启动延迟待实测'),pending('近视持续时间待实测')],
-    harbor:[variant.id==='surge'?confirmed('涡流爆炸前摇','12-00'):pending('水浪发射前摇待实测'),pending('近视持续时间待实测')],
+    harbor:[(variant.mechanic||variant.id)==='surge'?confirmed('涡流爆炸前摇','12-00'):pending('水浪发射前摇待实测'),pending('近视持续时间待实测')],
   };
   const [windup,duration]=entries[agent.id];
   return {windup,duration};

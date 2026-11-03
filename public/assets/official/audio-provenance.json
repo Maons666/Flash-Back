@@ -1,0 +1,101 @@
+{
+  "notes": "Edited from public Riot demonstration soundtracks; can include ambience. Not original isolated game audio. Some examples predate current balance changes.",
+  "clips": [
+    {
+      "path": "assets/official/hush-spawn.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data_live/ea594f0a6015912c13e07cbc55b67536b1cb5d02.webm?accountingTag=VAL",
+      "start": 2.05,
+      "duration": 0.28,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "b530bd67e1b244b32643cdac54bd258b7cf0aa21f78166061e9396762579d6d8"
+    },
+    {
+      "path": "assets/official/hush-redirect.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data_live/ea594f0a6015912c13e07cbc55b67536b1cb5d02.webm?accountingTag=VAL",
+      "start": 3.55,
+      "duration": 0.24,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "6397a9781ed5577f4a236dc1f963ecd5e409f558599bbe1f5cdb6dd348bfc61c"
+    },
+    {
+      "path": "assets/official/hush-result.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data_live/ea594f0a6015912c13e07cbc55b67536b1cb5d02.webm?accountingTag=VAL",
+      "start": 6.9,
+      "duration": 0.38,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "3d8c8aa0be8182ffe39febe7c4d7bb596ded1b454dd60a60e8ea4f7a6e1626b0"
+    },
+    {
+      "path": "assets/official/kayo-telegraph.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/9ad839fef2fd8d16d9608f8a6efd709091f0b74a.mp4?accountingTag=VAL",
+      "start": 5.1,
+      "duration": 0.22,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "0570446f3a1f6b00300fe971d02ef9470e332859592c55129fa4413966678948"
+    },
+    {
+      "path": "assets/official/kayo-result.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/9ad839fef2fd8d16d9608f8a6efd709091f0b74a.mp4?accountingTag=VAL",
+      "start": 5.4,
+      "duration": 0.32,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "6e9e290e25da10fd3cc020e823bc26c7d334cc78c5237e23bb0141acd748a864"
+    },
+    {
+      "path": "assets/official/yoru-bounce.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/295ab26ef6097d28da0bef9c9b4c6185a80071c8.mp4?accountingTag=VAL",
+      "start": 0.8,
+      "duration": 0.22,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "6873b5c9279b7476ed12504e1f7911b08aada36de3235369be44bb4cf153f5fd"
+    },
+    {
+      "path": "assets/official/yoru-result.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/295ab26ef6097d28da0bef9c9b4c6185a80071c8.mp4?accountingTag=VAL",
+      "start": 1.35,
+      "duration": 0.3,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "4df73a540cb1b0cb46286e66555711bf08ded1eb5d9f84436a3098cb0f948283"
+    },
+    {
+      "path": "assets/official/vyse-activate.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/5cefca2b93f097285ce2cb4f20fec7184b555218.mp4?accountingTag=VAL",
+      "start": 4.85,
+      "duration": 0.3,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "c8c16825700f5e37d297a286902ec134b4e5f0c8230e603582977166db7c7b55"
+    },
+    {
+      "path": "assets/official/vyse-result.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/5cefca2b93f097285ce2cb4f20fec7184b555218.mp4?accountingTag=VAL",
+      "start": 5.25,
+      "duration": 0.38,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "130f353de0cb2f052660c64628e730823bf539fd8bc2c4c2317b1beb52030580"
+    },
+    {
+      "path": "assets/official/gekko-spawn.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/f3a565e0cde441f1754eeadda2427020a795d4a0.mp4?accountingTag=VAL",
+      "start": 5.95,
+      "duration": 0.22,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "64b9383652f1aedfca6276594642056de08ef3ecb5353db4ede60332f3db0be5"
+    },
+    {
+      "path": "assets/official/gekko-lock.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/f3a565e0cde441f1754eeadda2427020a795d4a0.mp4?accountingTag=VAL",
+      "start": 7.4,
+      "duration": 0.25,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "9f1e5b81e5b0ea5e9fd2df05b76fc16b7a5d3d50baddcef8793489920b396e62"
+    },
+    {
+      "path": "assets/official/fade-spawn.ogg",
+      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/d401c0074081fd609fa08710174f27fc216c5b92.mp4?accountingTag=VAL",
+      "start": 1.2,
+      "duration": 0.3,
+      "kind": "official-demonstration-audio-excerpt",
+      "sha256": "3bbfd1f935ecdb6e69009b029649de83e38e2e35ec74f89c699959ced99be36c"
+    }
+  ]
+}

@@ -48,8 +48,18 @@ export function validateProfile(input) {
     if(angles.length<2||angles[0]!==0||angles.at(-1)!==180||new Set(angles).size!==angles.length)throw new Error('每个距离需要 0° 与 180° 端点，且角度不能重复。');
     const current=angles.join(',');if(signature&&signature!==current)throw new Error('各距离必须使用相同的角度采样网格。');signature=current;
   }
-  if(!Object.keys(timing).length&&!rows.length)throw new Error('至少提供一个时序值或一组衰减采样。');
-  return {schema:1,platform:'pc-global',patch:PATCH,agent:agent.id,variant:variant.id,reference:input.reference.trim(),timing,samples:rows};
+  const motion={};
+  if(input.motion!==undefined){
+    if(!input.motion||typeof input.motion!=='object'||!['kayo','skye','yoru','hush','gekko'].includes(agent.id))throw new Error('当前技能不支持弹道参数校准。');
+    for(const [key,min,max] of [['speed',1,60],['gravity',0,30],['restitution',0,1]]){
+      const value=input.motion[key];if(value===undefined)continue;
+      if(typeof value!=='number'||!Number.isFinite(value)||value<min||value>max)throw new Error(`${key} 需要在 ${min}–${max} 之间。`);
+      motion[key]=value;
+    }
+    if(agent.id==='skye'&&(motion.gravity>0||motion.restitution>0))throw new Error('Skye 鸟不使用重力或反弹系数。');
+  }
+  if(!Object.keys(timing).length&&!rows.length&&!Object.keys(motion).length)throw new Error('至少提供时序、弹道或衰减采样。');
+  return {schema:1,platform:'pc-global',patch:PATCH,agent:agent.id,variant:variant.id,reference:input.reference.trim(),timing,samples:rows,...(Object.keys(motion).length?{motion}:{})};
 }
 
 export function sanitizeProfiles(input) {

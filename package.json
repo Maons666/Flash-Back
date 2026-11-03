@@ -1,6 +1,6 @@
 {
   "name": "flash-dodger",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "type": "module",
   "description": "Local VALORANT flash avoidance trainer",
@@ -10,6 +10,10 @@
     "build": "node scripts/build.mjs",
     "package": "node scripts/build.mjs && node scripts/package-desktop.mjs"
   },
-  "dependencies": { "three": "0.180.0" },
-  "devDependencies": { "electron": "38.2.0" }
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "electron": "38.2.0"
+  }
 }

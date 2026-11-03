@@ -1,5 +1,5 @@
 export function box(x,z,w,d,h=3.2,style='wall') {return {min:[x-w/2,0,z-d/2],max:[x+w/2,h,z+d/2],style};}
-const boundary=()=>[box(-14.5,0,1,30,5),box(14.5,0,1,30,5),box(0,-14.5,28,1,5),box(0,14.5,28,1,5)];
+const boundary=()=>[box(-24.5,-10,1,54,7),box(24.5,-10,1,54,7),box(0,-36.5,48,1,7),box(0,16.5,48,1,7)];
 export const MAPS = [
   {id:'open',name:'基础靶场',sub:'开阔视野 · 建立反应',index:'01',blocks:[]},
   {id:'corner',name:'L 型拐角',sub:'墙边出闪 · 小身位',index:'02',blocks:[box(-5,-1,6,1,3.5),box(-7.5,3,1,7,3.5),box(7,-5,5,1,3.5),box(9,0,1,9,3.5)]},

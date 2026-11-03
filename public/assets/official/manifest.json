@@ -1,0 +1,378 @@
+{
+  "owner": "Riot Games",
+  "retrieved": "2026-11-03",
+  "source": "https://playvalorant.com/en-us/agents/",
+  "notes": "Official published images and demonstration videos. Videos may show older balance values. No original 3D meshes or isolated sound banks are supplied by these pages.",
+  "agents": {
+    "hush": {
+      "page": "https://playvalorant.com/en-us/agents/hush/",
+      "portrait": {
+        "path": "assets/official/hush-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/676c6e8495265181f2966626f280bb29baaf86ca-587x900.png?accountingTag=VAL",
+        "sha256": "1cf17a7e54fb649fb5b39e3a8066d714e22836494724b799aba0ab6ebb447cf0",
+        "bytes": 459272
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "FLASHBULB",
+          "description": "<p>EQUIP Flashbulb. FIRE to throw. ALT FIRE to prepare it instead. REACTIVATE to direct it towards your crosshair. Explodes on any surface or after a delay, flashing all players looking at it.</p>",
+          "icon": {
+            "path": "assets/official/hush-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/95868e9b61a376cfc5679e3339a0757bf2c4fd96-128x128.png?accountingTag=VAL",
+            "sha256": "0a9011cb56f720e9999fc7ce450138715e5d420c0c90898ad5f3599b446ab10a",
+            "bytes": 4090
+          },
+          "video": {
+            "path": "assets/official/hush-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data_live/ea594f0a6015912c13e07cbc55b67536b1cb5d02.webm?accountingTag=VAL",
+            "sha256": "7cf466971b4c3298f87d147c1a32a6c2f207d0762249644df77b46272c6d9d33",
+            "bytes": 2306901
+          }
+        }
+      ]
+    },
+    "phoenix": {
+      "page": "https://playvalorant.com/en-us/agents/phoenix/",
+      "portrait": {
+        "path": "assets/official/phoenix-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/47387e354c34d51b84066bc47af3c5755b92b9c5-616x822.png?accountingTag=VAL",
+        "sha256": "23ae1df429c7401592e4a4a23009cd7d0463bd4c5e2030532b3384ecdfd54f5c",
+        "bytes": 556121
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "CURVEBALL",
+          "description": "EQUIP a flare orb that takes a curving path and detonates shortly after throwing. FIRE to curve the flare orb to the left, detonating and blinding any player who sees the orb. ALTERNATE FIRE to curve the flare orb to the right.",
+          "icon": {
+            "path": "assets/official/phoenix-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data/beb874d19c79982f0e99e858098c067d9132a95a-128x128.png?accountingTag=VAL",
+            "sha256": "ed1aac8f16967d60ba735d6bf618621d3efcb515ead46e1dedc543f8bc86d31c",
+            "bytes": 2141
+          },
+          "video": {
+            "path": "assets/official/phoenix-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/c62125b1b5637b7b0e0881348502f7e8b8e93572.mp4?accountingTag=VAL",
+            "sha256": "0f11faaa7a611149fec212863e528e6837d1a69f0ef22141a578a781838df7cd",
+            "bytes": 2927574
+          }
+        }
+      ]
+    },
+    "breach": {
+      "page": "https://playvalorant.com/en-us/agents/breach/",
+      "portrait": {
+        "path": "assets/official/breach-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/e435c3378b7999a3338b408dbb5da8ba63f91150-616x822.png?accountingTag=VAL",
+        "sha256": "0f7a9656364cd5c8c7690fb7038eadaa12ad9e5eff8bdd5e8789ff9365567081",
+        "bytes": 589689
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "FLASHPOINT",
+          "description": "EQUIP a blinding charge. FIRE the charge to set  fast-acting burst through the wall. The charge detonates to blind all players looking at it.",
+          "icon": {
+            "path": "assets/official/breach-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data_live/cca58acc93956ee755ccea171a36584a402793c2-256x256.png?accountingTag=VAL",
+            "sha256": "bfec30e22799d47d9c0f08a7be4843737ebe07e0f4a8f790b5b915852c38b738",
+            "bytes": 6015
+          },
+          "video": {
+            "path": "assets/official/breach-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data_live/ffa4695b83e2f959bc59f0393dfc74e533546a89.mp4?accountingTag=VAL",
+            "sha256": "1fd544b2af5dc07a2d50d9fdd19e572b8d71cfb736734334369ba7c86afe40db",
+            "bytes": 1830932
+          }
+        }
+      ]
+    },
+    "skye": {
+      "page": "https://playvalorant.com/en-us/agents/skye/",
+      "portrait": {
+        "path": "assets/official/skye-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/37ea1466beebb54aad4f16efbad184566cb80368-616x822.png?accountingTag=VAL",
+        "sha256": "a80c0be94c62eb9e0e70f71d5f62d1a89799272b0743908a3a41ca2104079118",
+        "bytes": 488962
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "E - Guiding Light",
+          "description": "EQUIP a hawk trinket. FIRE to send it forward. HOLD FIRE to guide the hawk in the direction of your crosshair. RE-USE while the hawk is in flight to transform it into a flash that plays a hit confirm if an enemy was within range and line of sight.",
+          "icon": {
+            "path": "assets/official/skye-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data/ed6e5f91be20274ff84cb24644c3b559bfa8fed1-1024x1024.png?accountingTag=VAL",
+            "sha256": "493fd807acc283d9022b1ab1475e3fe8703038dd0231926cbce02e8073c8bce4",
+            "bytes": 40978
+          },
+          "video": {
+            "path": "assets/official/skye-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/64edfd7af8a7125dd9c981c52fdc60f9560b821b.mp4?accountingTag=VAL",
+            "sha256": "2db4781f24790bf062ca77973fa5940d625c0199727a4c95103b43dbdcea5194",
+            "bytes": 4373100
+          }
+        }
+      ]
+    },
+    "kayo": {
+      "page": "https://playvalorant.com/en-us/agents/kay-o/",
+      "portrait": {
+        "path": "assets/official/kayo-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/fe52e0efac73ec782b19a54e98a4658b03677407-616x822.png?accountingTag=VAL",
+        "sha256": "0108c950ec7f17f376608f67d570efef772a07b0ee2eb2ecfd63c2f8a60a43aa",
+        "bytes": 577826
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "FLASH/DRIVE",
+          "description": "EQUIP a flash grenade. FIRE to overhand throw. ALT FIRE to lob a weaker version that explodes quickly. The flash grenade explodes after a short fuse, Blinding anyone in line of sight.",
+          "icon": {
+            "path": "assets/official/kayo-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data/92fedb7a8c812df29cbaa2390aa07561fe2d89da-512x512.png?accountingTag=VAL",
+            "sha256": "0e6746edf1ff47eedac2f224c79f7bc693d8373f302e927b747f2eab4c295763",
+            "bytes": 15061
+          },
+          "video": {
+            "path": "assets/official/kayo-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/9ad839fef2fd8d16d9608f8a6efd709091f0b74a.mp4?accountingTag=VAL",
+            "sha256": "76b6723d5b3d671cb078608d6eea9ab515a00999e5cd5afb4b5f6941cd1ce254",
+            "bytes": 6925000
+          }
+        }
+      ]
+    },
+    "yoru": {
+      "page": "https://playvalorant.com/en-us/agents/yoru/",
+      "portrait": {
+        "path": "assets/official/yoru-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/05e1a996814dd10d7179efee327d29a7be00e912-616x822.png?accountingTag=VAL",
+        "sha256": "be4a3bbab011bda0a3cfe7635a3b3ac8355d4ca7222196cd5228fd60522dd0ba",
+        "bytes": 515766
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "BLINDSIDE",
+          "description": "EQUIP to rip an unstable dimensional fragment from reality. FIRE to throw the fragment, activating a flash that winds up once it collides with a hard surface in world.",
+          "icon": {
+            "path": "assets/official/yoru-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data/ea733bf224ae53e8e53cabfae19bfc12ce9fcda3-512x512.png?accountingTag=VAL",
+            "sha256": "322e056a6cb01f67e648064e5bec9ca20000526cc9bebec5fea49466f6f722db",
+            "bytes": 19193
+          },
+          "video": {
+            "path": "assets/official/yoru-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/295ab26ef6097d28da0bef9c9b4c6185a80071c8.mp4?accountingTag=VAL",
+            "sha256": "d155f491c6b04af0033f4e0aa6b5f1a92e421d89e3e0a57e3a920ca5e9eb1225",
+            "bytes": 4447483
+          }
+        },
+        {
+          "key": "clone",
+          "title": "FAKEOUT",
+          "description": "EQUIP an echo that transforms into a mirror image of Yoru when activated FIRE to instantly activate the mirror image and send it forward ALT FIRE to place an inactive echo USE to transform an inactive echo into a mirror image and send it forward.  Mirror images explode in a blinding flash when destroyed by enemies.",
+          "icon": {
+            "path": "assets/official/yoru-clone.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data/43416e5b34cd80c691ed0cc3b69fc73fae93f923-256x256.png?accountingTag=VAL",
+            "sha256": "a6ea2a6286c85558856339555edd7ecdf3576774034ce592289c4270d8e488f3",
+            "bytes": 6933
+          },
+          "video": {
+            "path": "assets/official/yoru-clone.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/ef008c8e848a054f88e88f173c03279a45a1c796.mp4?accountingTag=VAL",
+            "sha256": "2a1a88c889987f3f129b868cc9a87e0e0000664df42c67716cf2593eae0726a5",
+            "bytes": 1082224
+          }
+        }
+      ]
+    },
+    "vyse": {
+      "page": "https://playvalorant.com/en-us/agents/vyse/",
+      "portrait": {
+        "path": "assets/official/vyse-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/370e4b820670ef0bac7e685f6e8c5e64d19f1890-587x900.png?accountingTag=VAL",
+        "sha256": "3ab008a3f5cd07359ff89d1bbafd9c97bdd557a9756363d92b328ced8e2957d5",
+        "bytes": 140939
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "Arc Rose",
+          "description": "<p>EQUIP an Arc Rose. Target a surface and FIRE to place a stealthed Arc Rose, or ALT Fire to place the Arc Rose through it. REUSE to blind all players looking at it. This ability can be picked up to be REDEPLOYED.</p>",
+          "icon": {
+            "path": "assets/official/vyse-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/f0ac7fb5d31a65820bcc22217abcafbbfb4077e7-1024x1024.png?accountingTag=VAL",
+            "sha256": "13e901dc630f2c3d005b1fb41e81c1d11f25c47a16f5003d560eca0a8a789cff",
+            "bytes": 22292
+          },
+          "video": {
+            "path": "assets/official/vyse-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/5cefca2b93f097285ce2cb4f20fec7184b555218.mp4?accountingTag=VAL",
+            "sha256": "b18699b1ae9e665eef9da299c2758da3ae1f175bf5a68357ef0be1ecb1926ab8",
+            "bytes": 22092149
+          }
+        }
+      ]
+    },
+    "gekko": {
+      "page": "https://playvalorant.com/en-us/agents/gekko/",
+      "portrait": {
+        "path": "assets/official/gekko-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/8d88f133f735f6a9077679b1ece754e5624c728e-616x822.png?accountingTag=VAL",
+        "sha256": "f315cdde21b325489fdf9d3862e6fe1118f8656bbb09541f19bbbdaa282f994c",
+        "bytes": 636479
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "DIZZY",
+          "description": "EQUIP Dizzy FIRE to send Dizzy soaring forward through the air. Dizzy charges then unleashes plasma blasts at enemies in line of sight. Enemies hit by her plasma are blinded. When Dizzy expires she reverts into a dormant globule INTERACT to reclaim the globule and gain another Dizzy charge after a short cooldown.",
+          "icon": {
+            "path": "assets/official/gekko-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data/5cd2d39b6747b897e6648172d084d355477ea545-255x248.png?accountingTag=VAL",
+            "sha256": "14ec1fcacfad584bbb38ce49929aaf0c98b27f6703111eeef4abcb5552fd541c",
+            "bytes": 8694
+          },
+          "video": {
+            "path": "assets/official/gekko-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/f3a565e0cde441f1754eeadda2427020a795d4a0.mp4?accountingTag=VAL",
+            "sha256": "62eef0b666bce65978ccc4e34a8e41b386e7dc0ce6b4445f4b74c830db6c2845",
+            "bytes": 1944725
+          }
+        }
+      ]
+    },
+    "reyna": {
+      "page": "https://playvalorant.com/en-us/agents/reyna/",
+      "portrait": {
+        "path": "assets/official/reyna-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/7cb513c9b3eae3286449776e85753138436d553c-616x822.png?accountingTag=VAL",
+        "sha256": "eb84ff3e9da0e887f315b8c1442e4ba98b58e0dcbb5b3d525cac319faa6c20f3",
+        "bytes": 479272
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "LEER",
+          "description": "EQUIP an ethereal destructible eye. ACTIVATE to cast the eye a short distance forward. The eye will Nearsight all enemies who look at it.",
+          "icon": {
+            "path": "assets/official/reyna-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data/9d295b17382acbc17bdb4e45e0be74d58e94e6c5-256x256.png?accountingTag=VAL",
+            "sha256": "28de9add02b1e81a05baa53371c8c97d50fa1cdd5c5c73bbe13b99d4f32a8c05",
+            "bytes": 4931
+          },
+          "video": {
+            "path": "assets/official/reyna-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/01030fba2df618b91c6185bb076f54e8c6c40415.mp4?accountingTag=VAL",
+            "sha256": "6c913eca1a07f720c913fa3277c2a647ae74adde7835b0ce32bee64166bfbf3c",
+            "bytes": 3273677
+          }
+        }
+      ]
+    },
+    "omen": {
+      "page": "https://playvalorant.com/en-us/agents/omen/",
+      "portrait": {
+        "path": "assets/official/omen-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/015a083717e9687de8a741cfceddb836775b5f9f-616x822.png?accountingTag=VAL",
+        "sha256": "4c1b356bc9ebb3a81949a0704e4d0cc51a257db2f7ef4e114ca945e618b8e82a",
+        "bytes": 451707
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "PARANOIA",
+          "description": "INSTANTLY fire a shadow projectile forward, briefly reducing the vision range of all players it touches. This projectile can pass straight through walls.",
+          "icon": {
+            "path": "assets/official/omen-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data/e8544e323a51c9b8ff7ae8fca257e038a570819d-128x128.png?accountingTag=VAL",
+            "sha256": "80ed2a57c33146a256d628c1e95d83e78bb47782ecac0b404a519c9733abe9f4",
+            "bytes": 2539
+          },
+          "video": {
+            "path": "assets/official/omen-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/f401fc788f3182b6d5aa25af6056c842117b1b36.mp4?accountingTag=VAL",
+            "sha256": "a95ed5147c7f0f325458922be158acbbf3a40b11a4c944823b6f5f261ad51118",
+            "bytes": 2670195
+          }
+        }
+      ]
+    },
+    "fade": {
+      "page": "https://playvalorant.com/en-us/agents/fade/",
+      "portrait": {
+        "path": "assets/official/fade-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/e7099cc13a665ed2b556d514e50984393ed49967-616x822.png?accountingTag=VAL",
+        "sha256": "de2ac93a19d1619a1743dd91a5212af16f27c43d83b0fe61ecb7943144413244",
+        "bytes": 470296
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "PROWLER",
+          "description": "EQUIP a Prowler. FIRE will send the Prowler out, causing it to travel in a straight line.\nThe Prowler will lock onto any enemies or trails in their frontal vision cone and chase\nthem, nearsighting them if it reaches them. HOLD the FIRE button to steer the Prowler in\nthe direction of your crosshair.",
+          "icon": {
+            "path": "assets/official/fade-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/game_data/0389b190631d8c27a09e147070aab4b706113959-128x128.png?accountingTag=VAL",
+            "sha256": "eed6bea8b9a096fd15e8f6b1be7a20e3cd54f46517438d06bd8af6085b791d79",
+            "bytes": 2884
+          },
+          "video": {
+            "path": "assets/official/fade-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/d401c0074081fd609fa08710174f27fc216c5b92.mp4?accountingTag=VAL",
+            "sha256": "d8b136d7b47073b63d4633fd6781808ce060078e523ca05347dc567817caaafa",
+            "bytes": 2404992
+          }
+        }
+      ]
+    },
+    "harbor": {
+      "page": "https://playvalorant.com/en-us/agents/harbor/",
+      "portrait": {
+        "path": "assets/official/harbor-portrait.png",
+        "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/1246b5c517f6c8fa660e884a7032c1c54994003e-616x822.png?accountingTag=VAL",
+        "sha256": "b45d5dcb35b0eef61db891d0f91dfd44173fdf4cb5be3a8a35cc979daface50f",
+        "bytes": 597192
+      },
+      "abilities": [
+        {
+          "key": "flash",
+          "title": "STORM SURGE",
+          "description": "<p>EQUIP Storm Surge. FIRE to throw, creating an explosive whirlpool that Nearsights and Slows enemies within it after a short duration.</p>",
+          "icon": {
+            "path": "assets/official/harbor-flash.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/95fee21657c2d93ebc45991e01e7ecd24cfb8de5-128x128.png?accountingTag=VAL",
+            "sha256": "61fe573e722354d216ed0c06a7bda652c59ef98dafbf1db9d8d0b3bf994fb8ad",
+            "bytes": 2615
+          },
+          "video": {
+            "path": "assets/official/harbor-flash.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/news_live/e8a2822075831bdda3b1a121a569c61cb865eb59.mp4?accountingTag=VAL",
+            "sha256": "7d8b1e35388f6a98860ccfcb7d967b48822d4a286ea285c25f8ab79814e8be76",
+            "bytes": 1848772
+          }
+        },
+        {
+          "key": "wave",
+          "title": "RECKONING",
+          "description": "<p>EQUIP Reckoning. FIRE to unleash the full power of your artifact, releasing a surge of water that barrels forward to Nearsight and Slow enemies that are hit.</p>",
+          "icon": {
+            "path": "assets/official/harbor-wave.png",
+            "source": "https://cmsassets.rgpub.io/sanity/images/dsfx7636/news_live/6aef01d0fab39b3a05756749692a3508880bbde4-128x128.png?accountingTag=VAL",
+            "sha256": "ca10c6cad5bac5569b4b92a7105488ce59c23139ece8f69abd6829456813c63e",
+            "bytes": 2435
+          },
+          "video": {
+            "path": "assets/official/harbor-wave.mp4",
+            "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/news_live/820946b15b9a68ca46270d44363574dc634b8c1f.mp4?accountingTag=VAL",
+            "sha256": "fc48b6ee2fe49c1dd49d012407a42e5c65e29c2fb2672d6e1f221d08e239acc3",
+            "bytes": 1863898
+          }
+        }
+      ]
+    }
+  }
+}

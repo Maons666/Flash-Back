@@ -1,6 +1,8 @@
 import { mkdir, cp, rename, writeFile, stat, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-const root=resolve(import.meta.dirname,'..'), target=resolve(root,'release/FlashDodger');
+const root=resolve(import.meta.dirname,'..');
+const packageInfo=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'));
+const shortVersion=packageInfo.version.split('.').slice(0,2).join('.'),target=resolve(root,`release/FlashDodger-v${shortVersion}`);
 await mkdir(target,{recursive:true});
 await cp(resolve(root,'node_modules/electron/dist'),target,{recursive:true,filter:source=>!source.endsWith('default_app.asar')});
 await rename(resolve(target,'electron.exe'),resolve(target,'FlashDodger.exe'));
@@ -9,7 +11,6 @@ const app=resolve(target,'resources/app');
 await mkdir(app,{recursive:true});
 await cp(resolve(root,'dist'),resolve(app,'dist'),{recursive:true});
 await cp(resolve(root,'desktop'),resolve(app,'desktop'),{recursive:true});
-const packageInfo=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'));
 await writeFile(resolve(app,'package.json'),JSON.stringify({name:'flash-dodger',productName:'背闪训练器',version:packageInfo.version,main:'desktop/main.cjs'}));
 await cp(resolve(root,'docs'),resolve(target,'docs'),{recursive:true});
 await cp(resolve(root,'README.md'),resolve(target,'使用说明.md'));

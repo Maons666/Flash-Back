@@ -2,6 +2,7 @@ import { getAgent, FLASH_AGENTS, PATCH, SIMULATION_REVISION } from './data.js';
 import { resolveTiming } from './accuracy.js';
 import { add, sub, scale, dot, normalize, distance, lerp, forward, angleTo, clamp, trace, occluded, movePlayer, flashExposure, bounceFuse, yawDelta, inView } from './math.js';
 import { makeMap } from './maps.js';
+import { planThreat, sampleRoute } from './trajectories.js';
 
 export class Trainer {
   constructor(settings, onEvent=()=>{}, random=Math.random) {
@@ -44,7 +45,7 @@ export class Trainer {
   }
   spawn(agentOverride,variantOverride) {
     const agent=agentOverride|| (this.settings.random?FLASH_AGENTS[Math.floor(this.random()*FLASH_AGENTS.length)]:getAgent(this.settings.agent));
-    const variant=variantOverride||(this.settings.random?agent.variants[Math.floor(this.random()*agent.variants.length)]:agent.variants.find(v=>v.id===this.settings.variant)||agent.variants[0]);
+    const variant=variantOverride||((this.settings.random||this.settings.mixVariants)?agent.variants[Math.floor(this.random()*agent.variants.length)]:agent.variants.find(v=>v.id===this.settings.variant)||agent.variants[0]);
     const dir=forward(this.yaw,0), right=[-dir[2],0,dir[0]];
     const side=this.settings.side==='left'?-1:this.settings.side==='right'?1:(this.random()<.5?-1:1);
     const anchor=add(this.player,add(scale(dir,6.5),scale(right,side*1.8)));
@@ -66,23 +67,14 @@ export class Trainer {
       seenAt:null,reaction:null,angle:0,side,right,dir,events:[],stage:'flying',health:1,
       bounced:false,dead:false,resolved:false,visible:true,trail:[],travel:0};
     this.round++;this.phase='threat';this.gate=null;this.lastResult=null;
-    if(agent.id==='phoenix') {const curve=variant.id==='left'?-1:1;t.start=add(source,add(scale(right,-curve*1.6),scale(dir,1.6)));t.control=add(source,scale(dir,2));t.position=[...t.start];}
-    if(agent.id==='skye'||agent.id==='hush') {t.start=add(source,add(scale(right,-side*3),scale(dir,3)));t.position=[...t.start];t.velocity=scale(normalize(sub(source,t.start)),agent.id==='hush'?9:7);}
-    if(agent.id==='skye'){t.activateAt=timing.flightTime;t.fuse=t.activateAt+timing.windup;}
-    if(agent.id==='kayo') {
-      t.position=add(source,scale(dir,2.8));
-      t.velocity=add(scale(dir,-(variant.id==='underhand'?2.8:4.5)),[0,variant.id==='underhand'?1.2:3,0]);
-      if(variant.id==='bounce'){t.position[1]=.65;t.velocity[1]=-3;}
-    }
-    if(agent.id==='yoru'&&variant.id==='bounce') {
-      t.position=add(source,[0,-1.3,0]);t.velocity=[0,-5,0];t.stage='unarmed';t.visible=false;t.fuse=Infinity;
-    }
+    // Launch geometry and ballistic parameters are centralized in planThreat.
     if(agent.id==='yoru'&&variant.id==='clone'){t.position[1]=.9;t.stage='clone';t.fuse=Infinity;t.timeout=4;t.health=1;}
     if(agent.id==='gekko'){t.position[1]=2.8;t.stage='deploy';t.fuse=Infinity;t.health=1;t.activeAt=timing.windup;t.expires=t.activeAt+1;}
     if(agent.id==='reyna'){t.stage='eye';t.health=2;t.fuse=Infinity;t.expires=timing.duration;t.exposed=0;}
     if(agent.id==='omen'||(agent.id==='harbor'&&variant.id==='wave')){t.velocity=scale(normalize(sub(this.player,t.position)),agent.id==='omen'?20:10);t.fuse=Infinity;t.stage='wave';t.maxTravel=agent.id==='omen'?25:35;}
     if(agent.id==='fade'){t.position[1]=.65;t.health=3;t.fuse=Infinity;t.stage='chase';t.expires=4;}
-    if(agent.id==='harbor'&&variant.id==='surge'){t.position=add(this.player,scale(dir,1.2));t.position[1]=.05;}
+    if(agent.id==='harbor'&&(variant.mechanic||variant.id)==='surge'){t.position=add(this.player,scale(dir,1.2));t.position[1]=.05;}
+    planThreat(t,this);
     this.emit({type:'spawn',threat:t});
   }
   update(dt) {
@@ -97,7 +89,10 @@ export class Trainer {
       if(this.phase==='recovery')deadlines.push(this.recoverUntil-this.time);
       if(t&&!t.resolved) {
         deadlines.push(t.fuse-t.age,t.timeout-t.age,t.expires-t.age,t.activeAt-t.age,t.fireAt-t.age,t.impactAt-t.age,t.activateAt-t.age,t.timing.windup-t.age);
-        if(t.agent.id==='hush'&&!t.redirected)deadlines.push(t.fuse*.4-t.age);
+        if(t.agent.id==='hush'&&!t.redirected)deadlines.push(t.redirectAt-t.age);
+        if(t.agent.id==='skye')deadlines.push(.75-t.age);
+        if(t.agent.id==='kayo')deadlines.push(t.fuse-.3-t.age);
+        if(t.armAt)deadlines.push(t.armAt-t.age);
       }
       for(const deadline of deadlines)if(deadline>1e-9&&deadline<slice)slice=deadline;
       this.updateStep(slice);remaining-=slice;
@@ -134,24 +129,32 @@ export class Trainer {
       if(!t.stopped){const hit=trace(before,next,this.map.boxes,.08);t.position=hit?add(hit.point,scale(hit.normal,.1)):next;t.stopped=Boolean(hit);}
     }
     if(agent.id==='skye') {
-      const u=clamp(t.age/t.activateAt,0,1);const next=lerp(t.start,t.origin,u);next[0]+=Math.sin(u*Math.PI)*t.side;
-      if(!t.stopped){const hit=trace(before,next,this.map.boxes,.08);t.position=hit?add(hit.point,scale(hit.normal,.1)):next;t.stopped=Boolean(hit);}
+      const sample=sampleRoute(t.route,Math.min(t.age,t.activateAt)*t.motion.speed),next=sample.position;
+      if(!t.stopped){const hit=trace(before,next,this.map.boxes,.1);t.position=hit?add(hit.point,scale(hit.normal,.015)):next;t.stopped=Boolean(hit);t.direction=sample.direction;if(hit)t.events.push({type:'contact',at:t.age,position:[...t.position],normal:hit.normal});}
+      if(t.age+1e-9>=.75&&!t.charged){t.charged=true;this.emit({type:'charged',threat:t});}
       if(t.age+1e-9>=t.activateAt&&t.stage==='flying'){t.stage='activating';t.stopped=true;this.emit({type:'activate',threat:t});}
     }
     if(agent.id==='hush') {
-      if(variant.id==='impact'&&!t.redirected){t.velocity=add(scale(t.dir,-4),[0,-6,0]);t.redirected=true;}
-      this.projectile(t,dt,0,'impact');
-      if(!t.resolved&&variant.id==='redirect'&&t.age+1e-9>=t.fuse*.4&&!t.redirected){t.velocity=scale(normalize(sub(add(t.initialPlayer,scale(t.dir,3)),t.position)),9);t.redirected=true;this.emit({type:'redirect',threat:t});}
+      this.projectile(t,dt,t.redirected?0:t.motion.gravity,'impact');
+      if(!t.resolved&&t.mechanic==='redirect'&&t.age+1e-9>=t.redirectAt&&!t.redirected){t.velocity=scale(normalize(sub(add(t.launchTarget,scale(t.dir,4)),t.position)),t.motion.speed);t.redirected=true;this.emit({type:'redirect',threat:t});}
     }
-    if(agent.id==='kayo')this.projectile(t,dt,9.8,'kayo');
+    if(agent.id==='kayo'){
+      this.projectile(t,dt,t.motion.gravity,'kayo');
+      if(!t.telegraph&&t.age+1e-9>=t.fuse-.3){t.telegraph=true;this.emit({type:'telegraph',threat:t});}
+    }
+    if(agent.id==='vyse'&&t.stage==='dormant'&&t.age+1e-9>=t.armAt){t.stage='activating';this.emit({type:'activate',threat:t});}
     if(agent.id==='yoru') {
-      if(variant.id==='bounce')this.projectile(t,dt,t.bounced?0:4,'yoru');
+      if(t.mechanic==='bounce'){
+        this.projectile(t,dt,t.bounced?0:t.motion.gravity,'yoru');
+        if(!t.bounced&&t.age>=t.timeout){this.finish(t,{outcome:'evaded',success:true,label:'未激活闪球',duration:0,angle:0});return;}
+      }
       else if(t.stage==='clone') {
         const next=add(t.position,scale(t.dir,-2*dt));const hit=trace(t.position,next,this.map.boxes,.2);if(!hit)t.position=next;
         if(t.age>=t.timeout){this.finish(t,{outcome:'ignored',success:true,label:'识破分身',duration:0,angle:0});return;}
       }
     }
     if(agent.id==='gekko') {
+      if(t.stage==='deploy'&&t.age<=t.activeAt+1e-9)this.projectile(t,dt,t.motion.gravity,'dizzy');
       const target=this.dizzyTarget(t);
       if(t.stage!=='plasma'&&t.age+1e-9>=t.expires){this.finish(t,{outcome:'cover',success:true,label:'阻断锁定',duration:0,angle:0});return;}
       if(t.stage==='deploy'&&t.age+1e-9>=t.activeAt&&target){t.stage='lock';t.fireAt=t.age+.35;this.emit({type:'lock',threat:t});}
@@ -165,6 +168,7 @@ export class Trainer {
       }
     }
     if(agent.id==='reyna') {
+      t.position=lerp(t.eyeStart,t.eyeTarget,clamp(t.age/t.timing.windup,0,1));
       const activeDt=Math.max(0,Math.min(t.age,t.expires)-Math.max(t.age-dt,t.timing.windup));
       const visible=!occluded(this.player,t.position,this.map.boxes)&&inView(this.player,t.position,this.yaw,this.pitch);
       if(visible)t.exposed+=activeDt;
@@ -188,7 +192,9 @@ export class Trainer {
     }
     if(!this.presentationTiming)this.markPresented();
     if(t.age+1e-9>=t.fuse&&!t.resolved)this.detonate(t);
-    if(t.trail.length===0||distance(t.trail.at(-1),t.position)>.25){t.trail.push([...t.position]);if(t.trail.length>18)t.trail.shift();}
+    if(!t.trail.length||distance(t.trail.at(-1).position,t.position)>.06)t.trail.push({position:[...t.position],at:t.age});
+    t.trail=t.trail.filter(p=>t.age-p.at<.28).slice(-80);
+    if(distance(t.history.at(-1),t.position)>.1&&t.history.length<1024)t.history.push([...t.position]);
   }
   dizzyTarget(t) {
     if(distance(t.position,this.player)>45)return null;
@@ -212,14 +218,18 @@ export class Trainer {
     const used=dt*hit.t,hitAge=startAge+used;
     t.velocity[1]=velocity[1]-gravity*used;
     t.position=add(hit.point,scale(hit.normal,.001));
-    if(kind==='impact'){this.detonate(t,startTime+used);return;}
-    t.velocity=scale(sub(t.velocity,scale(hit.normal,2*dot(t.velocity,hit.normal))),kind==='kayo'?.6:1);
+    if(kind==='impact'){t.events.push({type:'contact',at:hitAge,position:[...t.position],normal:hit.normal});this.detonate(t,startTime+used);return;}
+    t.velocity=scale(sub(t.velocity,scale(hit.normal,2*dot(t.velocity,hit.normal))),t.motion?.restitution??(kind==='kayo'?.6:1));
     if(kind==='kayo') {
-      if(t.variant.id!=='underhand')t.fuse=hitAge+bounceFuse(t.fuse-hitAge);
+      if(t.mechanic!=='underhand'){
+        if(t.fuse-hitAge>.8+1e-9&&!t.bounceArmed){t.bounceArmed=true;this.emit({type:'bounce-arm',threat:t});}
+        t.fuse=hitAge+bounceFuse(t.fuse-hitAge);
+      }
       if(Math.abs(t.velocity[1])<.3&&hit.normal[1]===1)t.velocity[1]=0;
     }
     if(kind==='yoru'&&!t.bounced){t.fuse=hitAge+t.timing.windup;t.stage='armed';t.visible=true;}
-    if(!t.bounced)this.emit({type:'bounce',threat:t});t.bounced=true;
+    if(!t.bounced||Math.hypot(...t.velocity)>1)this.emit({type:'bounce',threat:t});
+    t.events.push({type:'bounce',at:hitAge,position:[...t.position],normal:hit.normal});t.lastBounceAt=hitAge;t.bounced=true;
     this.projectile(t,dt-used,kind==='yoru'?0:gravity,kind,depth+1,hitAge,startTime+used);
   }
   detonate(t,at=this.time) {
@@ -260,7 +270,7 @@ export class Trainer {
       approximate:true,patch:PATCH,revision:SIMULATION_REVISION,platform:'pc-global',profileReference:t.timing.profile?.reference??'',mode:this.settings.mode,arena:this.settings.arena};
     this.results.push(record);this.lastResult=record;this.phase='recovery';
     this.recoverUntil=this.time+Math.max(1.3,result.noAfterEffect?0:result.duration+.6);
-    if(result.duration>0&&!result.noAfterEffect)this.effect={type:result.effect||'flash',until:at+result.duration,duration:result.duration,strength:result.strength??1,slow:result.slow};
+    if(result.duration>0&&!result.noAfterEffect)this.effect={type:result.effect||'flash',agent:t.agent.id,position:[...t.position],at,until:at+result.duration,duration:result.duration,strength:result.strength??1,slow:result.slow};
     this.emit({type:'result',result:record,threat:t});
   }
 }
