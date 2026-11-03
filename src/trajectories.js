@@ -1,4 +1,4 @@
-import {add,sub,scale,dot,normalize,distance,lerp,clamp,trace} from './math.js';
+import {add,sub,scale,dot,normalize,distance,lerp,clamp,trace,inView} from './math.js';
 
 // Public community measurements are a starting point, not Riot certification.
 // Gravity conversion and restitution still require local recording calibration.
@@ -8,15 +8,18 @@ export function motionFor(agent,variant,profile){
   if(agent.id==='kayo'&&(variant.mechanic||variant.id)==='underhand')base.speed=6.3;
   return {...base,...profile?.motion};
 }
-export function freePoint(point,boxes,fallback){
-  const valid=p=>p[0]>-23.7&&p[0]<23.7&&p[2]>-35.7&&p[2]<15.7&&p[1]>.15&&!trace(p,p,boxes,.16);
+export function freePoint(point,boxes,fallback,radius=.16){
+  const valid=p=>p[0]>-23.7&&p[0]<23.7&&p[2]>-35.7&&p[2]<15.7&&p[1]>.15&&!trace(p,p,boxes,radius);
   if(valid(point))return [...point];
   for(let i=1;i<=80;i++){const p=lerp(point,fallback,i/80);if(valid(p))return p;}
   return [...fallback];
 }
 export function wallFace(player,dir,right,side,boxes,height=1.7,lateral=6){
+  return wallFaces(player,dir,right,side,boxes,height,lateral)[0]||null;
+}
+function wallFaces(player,dir,right,side,boxes,height,lateral){
   const aim=add(player,add(scale(dir,7),scale(right,side*lateral)));aim[1]=height;
-  let best=null;
+  const faces=[];
   for(const box of boxes)for(const axis of [0,2])for(const sign of [-1,1]){
     const normal=[0,0,0];normal[axis]=sign;
     const point=aim.map((n,i)=>clamp(n,box.min[i]+.22,box.max[i]-.22));
@@ -25,24 +28,52 @@ export function wallFace(player,dir,right,side,boxes,height=1.7,lateral=6){
     const ahead=dot(sub(point,player),dir);if(ahead<.4)continue;
     const view=dot(normalize(sub(point,player)),dir);
     const score=distance(point,aim)+Math.max(0,distance(player,point)-18)*2+(view<.62?70:0);
-    if(!best||score<best.score)best={point,normal,box,score};
+    faces.push({point,normal,box,score});
   }
-  return best;
+  return faces.sort((a,b)=>a.score-b.score);
 }
-export function bankThrow(player,dir,right,side,boxes,speed,gravity,height=1.8){
-  const face=wallFace(player,dir,right,side,boxes,height,8);
-  if(!face)return null;
-  const goal=add(player,scale(dir,3.5)),out=normalize(sub(goal,face.point));out[1]=0;
+export function bankThrow(player,dir,right,side,boxes,speed,gravity,height=1.8,goalDistance=3.5,postFlight=0){
+  for(const face of wallFaces(player,dir,right,side,boxes,height,8)){
+  const goal=add(player,scale(dir,goalDistance)),out=normalize(sub(goal,face.point));out[1]=0;
   const incoming=normalize(sub(out,scale(face.normal,2*dot(out,face.normal))));
+  if(dot(incoming,face.normal)>=0)continue;
   const flight=.28,vy=(face.point[1]-1.6+.5*gravity*flight*flight)/flight;
   const horizontal=Math.sqrt(Math.max(4,speed*speed-vy*vy));
   const velocity=add(scale(incoming,horizontal),[0,vy,0]);
   const impact=add(face.point,scale(face.normal,-.06));
   const origin=sub(impact,add(scale(velocity,flight),[0,-.5*gravity*flight*flight,0]));
-  if(trace(origin,origin,boxes,.12)||origin[1]<.4)return null;
+  if(trace(origin,origin,boxes,.12)||origin[1]<.4)continue;
   const hit=trace(origin,add(impact,scale(face.normal,-.2)),boxes,.08);
-  if(!hit||hit.box!==face.box)return null;
+  if(!hit||hit.box!==face.box)continue;
+  if(postFlight){
+    const atContact=add(velocity,[0,-gravity*flight,0]),reflected=sub(atContact,scale(face.normal,2*dot(atContact,face.normal)));
+    const after=add(impact,scale(face.normal,.01)),end=add(after,scale(reflected,postFlight));
+    if(trace(after,end,boxes,.08)||trace(player,end,boxes)||dot(normalize(sub(end,player)),dir)<.7)continue;
+  }
   return {origin,velocity,face};
+  }
+  return null;
+}
+function curveballPlan(t,game){
+  const {variant,dir,right,side}=t,player=game.player,boxes=game.map.boxes,height=variant.height??1.8;
+  const wanted=(variant.mechanic||variant.id)==='left'?-1:1;
+  let best;
+  for(const box of boxes)for(const axis of [0,2])for(const sign of [-1,1])for(const edgeSign of [-1,1]){
+    if(box.max[axis]-box.min[axis]>2.5)continue;
+    const other=axis===0?2:0,normal=[0,0,0],tangent=[0,0,0];normal[axis]=sign;tangent[other]=edgeSign;
+    const edge=[0,height,0];edge[axis]=(sign<0?box.min:box.max)[axis]+sign*.14;edge[other]=(edgeSign<0?box.min:box.max)[other]+edgeSign*.55;
+    if(dot(sub(player,edge),normal)<=0||distance(player,edge)>18)continue;
+    const start=add(edge,add(scale(tangent,variant.id==='reverse'?-2.2:-1.6),scale(normal,-1.4)));
+    const control=add(edge,add(scale(tangent,1.2),scale(normal,-1.6))),end=add(edge,scale(normal,.8));
+    const u=sub(control,start),v=sub(end,control),turn=u[2]*v[0]-u[0]*v[2];
+    if(Math.sign(turn)!==wanted||!inView(player,end,game.yaw,game.pitch)||trace(player,end,boxes,.03)||trace(start,start,boxes,.1))continue;
+    let previous=start,clear=true;
+    for(let i=1;i<=60;i++){const f=i/60,next=add(add(scale(start,(1-f)**2),scale(control,2*f*(1-f))),scale(end,f*f));if(trace(previous,next,boxes,.09)){clear=false;break;}previous=next;}
+    if(!clear)continue;
+    const score=distance(player,end)+(dot(sub(end,player),right)*side<0?4:0)+(trace(player,start,boxes)?0:3);
+    if(!best||score<best.score)best={start,control,end,score};
+  }
+  return best;
 }
 function routeFromPoints(points){
   const samples=[points[0]];
@@ -122,9 +153,9 @@ export function planThreat(t,game){
     t.position=freePoint(t.position,boxes,add(player,scale(dir,2)));
   }
   if(agent.id==='yoru'&&mechanic==='bounce'){
-    const bank=variant.id!=='ground'?bankThrow(player,dir,right,side,boxes,29,4.41,variant.id==='high'?3.5:1.8):null;
+    const bank=variant.id!=='ground'?bankThrow(player,dir,right,side,boxes,29,4.41,variant.id==='high'?3.5:1.8,12,.6):null;
     if(bank){t.position=bank.origin;t.velocity=scale(bank.velocity,m.speed/29);t.plannedContact=bank.face.point;}
-    else{t.position=freePoint(add(player,add(scale(dir,10),scale(right,side*2))),boxes,player);t.position[1]=1.6;t.velocity=scale(normalize(add(scale(dir,-7),[0,-12,0])),m.speed);}
+    else{t.position=freePoint(add(player,add(scale(dir,28),scale(right,side*1.6))),boxes,player);t.position[1]=1.6;t.velocity=scale(add(scale(dir,-Math.cos(Math.PI/10)),[0,-Math.sin(Math.PI/10),0]),m.speed);if(variant.id!=='ground')t.planNote='当前站位无可用墙弹路线，使用地面反弹';}
     t.stage='unarmed';t.visible=false;t.fuse=Infinity;t.timeout=3;
   }
   if(['breach','vyse'].includes(agent.id)){
@@ -133,18 +164,10 @@ export function planThreat(t,game){
     if(agent.id==='vyse'&&variant.id==='delayed'){t.armAt=1.4;t.stage='dormant';t.fuse+=t.armAt;}
   }
   if(agent.id==='phoenix'){
-    const face=wallFace(player,dir,right,side,boxes,variant.height??1.7,5);
-    let end=[...t.position];
-    if(face&&distance(player,face.point)<16){
-      const axis=face.normal[0]!==0?2:0;
-      const ends=[face.box.min[axis]-.5,face.box.max[axis]+.5];
-      end=[...face.point];end[axis]=ends.sort((a,b)=>Math.abs(a-player[axis])-Math.abs(b-player[axis]))[0];
-      if(dot(sub(end,player),dir)<1)end=[...t.position];
-    }
-    end[1]=variant.height??1.8;
+    const corner=curveballPlan(t,game),end=corner?.end||[...t.position];end[1]=variant.height??1.8;
     const curve=mechanic==='left'?-1:1;
     t.origin=end;t.start=add(end,add(scale(right,-curve*(variant.id==='reverse'?2.2:1.4)),scale(dir,1.7)));
-    t.start=freePoint(t.start,boxes,add(player,scale(dir,3)));t.control=add(end,scale(dir,2.4));t.position=[...t.start];
+    t.start=corner?.start||freePoint(t.start,boxes,add(player,scale(dir,3)));t.control=corner?.control||add(end,scale(dir,2.4));t.position=[...t.start];
   }
   if(agent.id==='hush'){
     const target=add(player,add(scale(dir,4),scale(right,side*1.4)));target[1]=1.65;t.redirectAt=t.fuse*(variant.id==='late'?.68:.4);
@@ -173,6 +196,7 @@ export function planThreat(t,game){
   if(['omen','fade'].includes(agent.id)&&variant.id==='cross'){
     t.position=add(player,add(scale(dir,8),scale(right,side*7)));t.position[1]=agent.id==='fade'?.65:1.65;
     if(agent.id==='omen')t.velocity=scale(normalize(sub(add(player,scale(dir,1)),t.position)),20);
+    else t.position=freePoint(t.position,boxes,[player[0],.65,player[2]],.35);
   }
   if(agent.id==='harbor'&&variant.id==='surge-lead')t.position=add(t.position,scale(dir,3));
   t.launchPosition=[...t.position];t.launchTarget=[...player];t.trail=[{position:[...t.position],at:0}];t.history=[[...t.position]];

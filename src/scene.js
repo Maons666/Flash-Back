@@ -93,7 +93,10 @@ export class TrainingScene {
   }
   onEvent(event) {
     if(event.type==='result'&&event.result.effect==='flash'){
-      if(event.result.duration>0){this.renderer.render(this.scene,this.camera);this.exposure.capture(this.renderer,this.camera,event.threat.position);}
+      if(event.result.duration>0){
+        const view=this.observerMode;this.observerMode='player';this.burst.visible=false;
+        this.render();this.exposure.capture(this.renderer,this.camera,event.threat.position);this.observerMode=view;
+      }
       this.burst.position.set(...event.threat.position);this.burst.material.color.set(event.threat.agent.color);this.burstAt=this.trainer.time;this.burst.visible=true;
     }
   }
@@ -125,7 +128,7 @@ export class TrainingScene {
         if(this.pathLine.visible){for(let i=0;i<t.history.length;i++)this.pathPositions.set(t.history[i],i*3);this.pathGeometry.setDrawRange(0,t.history.length);this.pathGeometry.attributes.position.needsUpdate=true;}
       }
     }
-    if(this.burst.visible){const elapsed=game.time-this.burstAt;this.burst.visible=elapsed<.28;this.burst.scale.setScalar(1+elapsed*24);this.burst.material.opacity=Math.max(0,1-elapsed/.28);}
+    if(this.burst.visible){const elapsed=game.time-this.burstAt;this.burst.visible=elapsed>=0&&elapsed<.28;this.burst.scale.setScalar(Math.max(1,1+elapsed*24));this.burst.material.opacity=Math.max(0,1-elapsed/.28);}
     this.renderer.render(this.scene,this.camera);
     this.exposure.render(game.effect,game.time,game.settings.brightness,this.observerMode==='player'&&game.running);
   }

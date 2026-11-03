@@ -2,7 +2,7 @@ import { mkdir, cp, rename, writeFile, stat, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 const root=resolve(import.meta.dirname,'..');
 const packageInfo=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'));
-const shortVersion=packageInfo.version.split('.').slice(0,2).join('.'),target=resolve(root,`release/FlashDodger-v${shortVersion}`);
+const versionLabel=packageInfo.version.replace(/\.0$/,''),target=resolve(root,`release/FlashDodger-v${versionLabel}`);
 await mkdir(target,{recursive:true});
 await cp(resolve(root,'node_modules/electron/dist'),target,{recursive:true,filter:source=>!source.endsWith('default_app.asar')});
 await rename(resolve(target,'electron.exe'),resolve(target,'FlashDodger.exe'));

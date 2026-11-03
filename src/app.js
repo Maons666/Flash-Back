@@ -81,7 +81,7 @@ function renderSettings(){
   renderAgents();renderAbility();renderMaps();renderLibrary();persist();
 }
 function renderMaps(){
-  const shapes={open:'M4 4h24v24H4Z M13 16h6m-3-3v6',corner:'M5 5v22h11M5 13h13M24 5v20h-7',boxes:'M4 7h9v9H4Zm15 10h9v9h-9Z',corridor:'M5 3v26M27 3v26M5 10h11M17 22h10'};
+  const shapes={open:'M4 4h24v24H4Z M13 16h6m-3-3v6',corner:'M6 6v20h20M13 6v13h13',boxes:'M4 7h9v9H4Zm15 10h9v9h-9Z',corridor:'M5 3v26M27 3v26M5 10h11M17 22h10'};
   $('map-options').innerHTML=MAPS.map(m=>`<button class="map-option ${settings.arena===m.id?'selected':''}" data-map="${m.id}" title="${m.sub}"><svg viewBox="0 0 32 32"><path d="${shapes[m.id]}"/></svg><span>${m.name}</span></button>`).join('');
 }
 function updateStats(){
@@ -267,10 +267,9 @@ function renderHud(){
   if(calibrating)$('coach-cue').textContent=`已转 ${Math.abs(deg(game.yaw-calibrationYaw)).toFixed(1)}° / 180° · Esc 结束校准`;
   else if(settings.coach&&t)$('coach-cue').textContent=Number.isFinite(t.fuse)?`引爆倒计时 ${Math.max(0,t.fuse-t.age).toFixed(2)} s`:'锁定 / 追踪机制';
   $('hit-marker').hidden=game.time>hitUntil;
-  const remaining=e?Math.max(0,e.until-game.time):0,fade=e&&e.duration>0?Math.min(1,remaining/Math.min(e.duration*.45,.7)):0;
   $('flash-effect').style.opacity='0';
   $('plasma-effect').style.opacity='0';
-  $('near-effect').style.opacity=e?.type==='near'?'.8':'0';
+  $('near-effect').style.opacity='0';
 }
 new TechniquePreview(settings);
 renderSettings();updateStats();updateOverlay();

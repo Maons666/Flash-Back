@@ -1,6 +1,6 @@
-export const VERIFIED_DATE = '2026-11-02';
+export const VERIFIED_DATE = '2026-11-03';
 export const PATCH = '13.09';
-export const SIMULATION_REVISION = '0.10.0';
+export const SIMULATION_REVISION = '0.10.1';
 const official = slug => `https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-${slug}/`;
 export const SOURCES = [
   { title:'13.09 · Hush 的转向、触碰与延时引爆机制', url:official('1309') },
@@ -14,6 +14,7 @@ export const SOURCES = [
   { title:'1.07 · Breach 显现后的 0.5 秒引爆前摇', url:official('1-07') },
   { title:'2.06 · Yoru 反弹后的 0.6 秒激活时间', url:official('2-06') },
   { title:'3.06 · Skye 激活前摇、KAY/O 末段提示与飞行声音', url:official('3-06') },
+  { title:'11.10 · Yoru 反弹前对敌方隐藏，隐形阶段不应播放敌方提示音', url:official('11-10') },
   { title:'社区参考 · Skye 飞行速度，非 Riot 官方参数', url:'https://wiki.playvalorant.com/en-us/Guiding_Light' },
   { title:'社区参考 · 投射物速度与重力分类，换算仍待实测', url:'https://wiki.playvalorant.com/en-us/Projectile' },
   { title:'7.04 / 8.01 · Skye 最长飞行 2 秒、到时自动激活', url:official('8-01') },

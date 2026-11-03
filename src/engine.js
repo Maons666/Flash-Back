@@ -39,7 +39,9 @@ export class Trainer {
   markPresented() {
     const t=this.threat;
     if(!t||t.dead||t.resolved||!t.visible||t.seenAt!==null)return;
-    if(!occluded(this.player,t.position,this.map.boxes)&&inView(this.player,t.position,this.yaw,this.pitch)) {
+    const points=[t.position];
+    if(t.agent.id==='harbor'&&t.mechanic==='surge')for(let i=0;i<16;i++){const angle=i*Math.PI/8;points.push(add(t.position,[Math.cos(angle)*3.38,0,Math.sin(angle)*3.38]));}
+    if(points.some(point=>!occluded(this.player,point,this.map.boxes)&&inView(this.player,point,this.yaw,this.pitch))) {
       t.seenAt=this.time;t.initialLook=forward(this.yaw,this.pitch);t.initialPlayer=[...this.player];
     }
   }
@@ -227,7 +229,7 @@ export class Trainer {
       }
       if(Math.abs(t.velocity[1])<.3&&hit.normal[1]===1)t.velocity[1]=0;
     }
-    if(kind==='yoru'&&!t.bounced){t.fuse=hitAge+t.timing.windup;t.stage='armed';t.visible=true;}
+    if(kind==='yoru'&&!t.bounced){t.fuse=hitAge+t.timing.windup;t.stage='armed';t.visible=true;t.trail=[];}
     if(!t.bounced||Math.hypot(...t.velocity)>1)this.emit({type:'bounce',threat:t});
     t.events.push({type:'bounce',at:hitAge,position:[...t.position],normal:hit.normal});t.lastBounceAt=hitAge;t.bounced=true;
     this.projectile(t,dt-used,kind==='yoru'?0:gravity,kind,depth+1,hitAge,startTime+used);

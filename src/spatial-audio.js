@@ -42,7 +42,7 @@ export class TrainingAudio {
     const path=OFFICIAL_SOUNDS[id]?.[e.type];if(path&&this.clip(path,p,game))return;
     if(e.type==='spawn'){
       // KAY/O has no continuous flight telegraph audio (3.06).
-      if(id==='kayo')return;
+      if(id==='kayo'||(id==='yoru'&&t.mechanic==='bounce'))return;
       if(id==='skye'){this.noise(.18,p,game,.16);this.tone(1750,.2,p,game,.1,2500);}
       else if(id==='breach'){this.noise(.2,p,game,.35);this.tone(180,.3,p,game,.2,600,'sawtooth');}
       else if(id==='phoenix'){this.noise(.25,p,game,.22);this.tone(650,.18,p,game,.1,1250);}
