@@ -22,13 +22,13 @@ if(!MAPS.some(m=>m.id===settings.arena))settings.arena='corner';
 if(!['left','right','random'].includes(settings.side))settings.side='random';
 settings.custom=Array.isArray(settings.custom)?settings.custom.filter(p=>Array.isArray(p)&&p.length===2&&p.every(v=>Number.isFinite(v)&&Math.abs(v)<=12)).slice(0,40):[];
 let archive=load(historyKey,[]);if(!Array.isArray(archive))archive=[];archive=archive.filter(r=>r&&Number.isFinite(r.round)&&typeof r.agent==='string').slice(-200);
-let scene,game,filter='flash',calibrating=false,calibrationYaw=0,notifyTimer,hitUntil=0,lastFps=0,frames=0,rawStatus='等待鼠标捕获',draftCustom=[];
+let scene,game,calibrating=false,calibrationYaw=0,notifyTimer,hitUntil=0,lastFps=0,frames=0,rawStatus='等待鼠标捕获',draftCustom=[];
 const audio=new TrainingAudio(settings);
-const glyphs={hush:'M5 16 16 4 27 16 16 28Z M10 16h12M16 10v12',phoenix:'M17 3c4 8-6 9 2 14 3-3 4-4 4-7 9 11 2 19-7 19S3 20 8 14c1 5 3 6 5 5-3-7 2-9 4-16Z',breach:'M6 8h20v16H6ZM3 13h26M3 19h26M12 5v22M20 5v22',skye:'M3 9 14 14 16 5 18 14 29 9 23 19 18 20 16 28 14 20 9 19Z',kayo:'M9 4h14v24H9ZM12 9h8M12 14h8M12 19h8M6 10H3m3 12H3m23-12h3m-3 12h3',yoru:'M5 5 13 10 16 4 19 10 27 5 25 21 16 28 7 21ZM10 14l4 3m8-3-4 3M13 22h6',vyse:'M16 3 19 10 27 7 23 15 29 19 21 21 20 29 15 23 8 28 9 20 2 16 10 13 8 5ZM12 16a4 4 0 1 0 8 0 4 4 0 1 0-8 0',gekko:'M4 17c0-9 6-13 12-13s12 4 12 13-7 11-12 11S4 26 4 17ZM10 15a6 6 0 1 0 12 0 6 6 0 1 0-12 0M16 12v6',reyna:'M2 16Q16-3 30 16 16 35 2 16ZM10 16a6 6 0 1 0 12 0 6 6 0 1 0-12 0',omen:'M4 26 7 8 16 3 25 8 28 26 16 21ZM11 12v6m5-8v10m5-8v6',fade:'M4 6 12 10 16 4 20 10 28 6 25 23 16 29 7 23ZM10 16l4 2m8-2-4 2',harbor:'M3 12q6-8 13 0t13 0M3 20q6-8 13 0t13 0M3 28q6-8 13 0t13 0'};
+const glyphs={hush:'M5 16 16 4 27 16 16 28Z M10 16h12M16 10v12',phoenix:'M17 3c4 8-6 9 2 14 3-3 4-4 4-7 9 11 2 19-7 19S3 20 8 14c1 5 3 6 5 5-3-7 2-9 4-16Z',breach:'M6 8h20v16H6ZM3 13h26M3 19h26M12 5v22M20 5v22',skye:'M3 9 14 14 16 5 18 14 29 9 23 19 18 20 16 28 14 20 9 19Z',kayo:'M9 4h14v24H9ZM12 9h8M12 14h8M12 19h8M6 10H3m3 12H3m23-12h3m-3 12h3',yoru:'M5 5 13 10 16 4 19 10 27 5 25 21 16 28 7 21ZM10 14l4 3m8-3-4 3M13 22h6',vyse:'M16 3 19 10 27 7 23 15 29 19 21 21 20 29 15 23 8 28 9 20 2 16 10 13 8 5ZM12 16a4 4 0 1 0 8 0 4 4 0 1 0-8 0',gekko:'M4 17c0-9 6-13 12-13s12 4 12 13-7 11-12 11S4 26 4 17ZM10 15a6 6 0 1 0 12 0 6 6 0 1 0-12 0M16 12v6',reyna:'M2 16Q16-3 30 16 16 35 2 16ZM10 16a6 6 0 1 0 12 0 6 6 0 1 0-12 0'};
 const icon=id=>`<svg viewBox="0 0 32 32" aria-hidden="true"><path d="${glyphs[id]}"/></svg>`;
 const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function notify(message){$('notification').textContent=message;$('notification').hidden=false;clearTimeout(notifyTimer);notifyTimer=setTimeout(()=>$('notification').hidden=true,3600);}
-function persist(){try{localStorage.setItem(settingsKey,JSON.stringify(settings));$('save-status').textContent='设置保存在本机';}catch{$('save-status').textContent='设置保存失败';}}
+function persist(){try{localStorage.setItem(settingsKey,JSON.stringify(settings));$('save-status').textContent='已保存到本机';}catch{$('save-status').textContent='设置保存失败';}}
 function saveHistory(){try{localStorage.setItem(historyKey,JSON.stringify(archive));}catch{notify('本机记录暂时无法保存，可使用 CSV 导出。');}}
 function resetSession(){
   if(document.pointerLockElement)document.exitPointerLock();
@@ -36,17 +36,16 @@ function resetSession(){
   updateOverlay();updateStats();renderHud();
 }
 function renderAgents(){
-  const list=AGENTS.filter(a=>(a.kind==='nearsight')===(filter==='near'));
+  const list=FLASH_AGENTS;
   $('agent-count').textContent=`${String(list.length).padStart(2,'0')} AGENTS`;
   $('agents').innerHTML=list.map(a=>`<button class="agent-button ${settings.agent===a.id?'selected':''}" data-agent="${a.id}" style="--agent:${a.color}" title="${a.zh} · ${a.skill}" aria-pressed="${settings.agent===a.id}"><span class="agent-symbol">${OFFICIAL_ASSETS[a.id]?.portrait?`<img class="agent-portrait" src="./${OFFICIAL_ASSETS[a.id].portrait}" alt="${a.name}">`:icon(a.id)}</span><span class="agent-label">${a.name}</span></button>`).join('');
-  document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('selected',b.dataset.filter===filter));
 }
 function renderAbility(){
   const a=getAgent(settings.agent);let v=a.variants.find(v=>v.id===settings.variant)||a.variants[0];settings.variant=v.id;
-  $('ability-name').textContent=a.skill;$('ability-tag').textContent=a.tag?`V${a.tag}`:a.kind==='nearsight'?'近视':a.kind==='plasma'?'电浆':'FLASH';
+  $('ability-name').textContent=a.skill;$('ability-tag').textContent=a.tag?`V${a.tag}`:a.id==='reyna'?'魔眼':a.kind==='plasma'?'电浆':'FLASH';
   $('ability-description').textContent=a.description;$('counter').textContent=a.counter;
   $('variant').innerHTML=a.variants.map(v=>`<option value="${v.id}">${v.name}</option>`).join('');$('variant').value=settings.variant;
-  const skill=OFFICIAL_ASSETS[a.id]?.abilities?.find(s=>s.key===(v.id==='clone'?'clone':a.id==='harbor'&&(v.mechanic||v.id)==='wave'?'wave':'flash'));
+  const skill=OFFICIAL_ASSETS[a.id]?.abilities?.find(s=>s.key===(v.id==='clone'?'clone':'flash'));
   $('ability-icon').hidden=!skill;if(skill)$('ability-icon').src='./'+skill.icon;
   const timing=resolveTiming(a,v,settings),labels=timingLabels(a,v);
   $('windup-label').textContent=labels[0];$('duration-label').textContent=labels[1];
@@ -60,11 +59,11 @@ function evidenceHTML(a,v,timing){
   const evidence=timingEvidence(a,v),labels=timingLabels(a,v);
   const rows=['windup','duration'].map((key,i)=>{
     const item=evidence[key],custom=timing.profile?.timing?.[key]!==undefined;
-    const text=`${labels[i]}：${custom?'用户校准':evidenceNames[item.status]}`;
+    const text=`${labels[i]} · ${custom?'用户校准':evidenceNames[item.status]}`;
     return `<span title="${escapeHTML(custom?timing.profile.reference:item.note)}">${item.url&&!custom?`<a href="${item.url}" target="_blank" rel="noreferrer">${text} ↗</a>`:text}</span>`;
   });
-  if(a.id==='skye')rows.push(`<span>激活前飞行 ${timing.flightTime.toFixed(3)} s · ${timing.profile?.timing?.flightTime!==undefined?'用户校准':'训练情景'}；总计 ${(timing.flightTime+timing.windup).toFixed(3)} s</span>`);
-  rows.push(`<span>角度衰减：${timing.profile?.samples?.length?'用户采样插值（限采样距离）':'训练近似，待实测'}</span>`);
+  if(a.id==='skye')rows.push(`<span>飞行 ${timing.flightTime.toFixed(3)} s · ${timing.profile?.timing?.flightTime!==undefined?'已校准':'场景预设'}</span>`);
+  if(a.kind==='flash')rows.push(`<span>角度衰减 · ${timing.profile?.samples?.length?'采样内插值':'待校准'}</span>`);
   return rows.join('');
 }
 function renderLibrary(){
@@ -115,9 +114,9 @@ function updateOverlay(){
   $('start-overlay').hidden=game.running;
   document.body.classList.toggle('running',game.running);
   const complete=game.phase==='complete',paused=game.phase!=='ready';
-  $('overlay-kicker').textContent=complete?'本组训练完成':paused?'随时回到这一轮':'准备好你的下一次反应';
+  $('overlay-kicker').textContent=complete?'本组完成':paused?'继续本轮':'准备就绪';
   $('overlay-title').textContent=complete?'每一次转身，都算数。':paused?'训练已暂停。':'背身，躲过这一闪。';
-  $('overlay-description').innerHTML=complete?`完成 ${game.results.length} 次，规避成功 ${game.results.filter(r=>r.success).length} 次。<br>复盘下方记录，或继续下一组。`:paused?'时间和技能已暂停。<br>点击继续，重新捕获鼠标。':'识别技能出手，快速转身。<br>闪光爆开后，把准星拉回原位。';
+  $('overlay-description').innerHTML=complete?`完成 ${game.results.length} 次，规避成功 ${game.results.filter(r=>r.success).length} 次。<br>可查看记录或继续训练。`:paused?'已暂停，点击继续训练。':'识别来闪，转身，再回正。';
   $('start-button').innerHTML=`${complete?'再来一组':paused?'继续训练':'开始训练'} <span>→</span>`;
 }
 async function start(calibrate=false){
@@ -161,7 +160,6 @@ for(const [button,dialog] of [['library-button','library-dialog'],['accuracy-but
 document.querySelectorAll('.close-button').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
 document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('click',event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();}}));
 $('calibration-run').addEventListener('click',()=>{$('help-dialog').close();start(true);});
-document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{filter=button.dataset.filter;renderAgents();}));
 $('agents').addEventListener('click',event=>{const button=event.target.closest('[data-agent]');if(!button)return;settings.agent=button.dataset.agent;settings.variant=getAgent(settings.agent).variants[0].id;settings.random=false;resetSession();renderSettings();});
 $('modes').addEventListener('click',event=>{const button=event.target.closest('[data-mode]');if(!button)return;settings.mode=button.dataset.mode;resetSession();renderSettings();});
 $('map-options').addEventListener('click',event=>{const button=event.target.closest('[data-map]');if(!button)return;settings.arena=button.dataset.map;settings.custom=[];resetSession();renderSettings();});
@@ -214,7 +212,7 @@ function readMeasurementForm(){
 }
 function applyProfile(profile){
   settings.calibrations[profileKey(profile.agent,profile.variant)]=profile;settings.agent=profile.agent;settings.variant=profile.variant;
-  filter=getAgent(profile.agent).kind==='nearsight'?'near':'flash';resetSession();renderSettings();fillMeasurements();notify('已应用用户校准；仅适用于记录的版本和测量范围。');
+  resetSession();renderSettings();fillMeasurements();notify('已应用校准（限记录版本与范围）。');
 }
 $('measurement-apply').addEventListener('click',()=>{try{applyProfile(readMeasurementForm());}catch(error){$('measurement-error').textContent=error.message;}});
 $('measurement-restore').addEventListener('click',()=>{delete settings.calibrations[profileKey(settings.agent,settings.variant)];if(settings.agent==='hush'){settings.hushFuse=DEFAULTS.hushFuse;settings.hushDuration=DEFAULTS.hushDuration;}resetSession();renderSettings();fillMeasurements();notify('已恢复当前投法的默认值。');});

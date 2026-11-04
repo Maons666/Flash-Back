@@ -13,11 +13,11 @@
 | Vyse | 墙面闪，前摇中可射毁 | 0.5s 前摇，2s 满闪 | [官方特工](https://playvalorant.com/en-us/agents/vyse/)、[11.08](https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-11-08/)；前摇为训练基线 |
 | Gekko | 头部或身体可见可锁定；到期停止新发射；已发射电浆独立飞行 | 0.65s 部署待实测，0.35s 锁定，活动期 1s；电浆按公告 10000 单位换算为 100m/s；遮挡总计 2s 及渐隐待实测 | 锁定：[7.12](https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-7-12/)，活动期：[9.08](https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-9-08/)，身体可见性：[12.08](https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-12-08/)；身体采样点、溅射半径仍为近似 |
 
-其他练习：Reyna 的魔眼持续视线近视、Omen 的穿墙暗魇、Fade 的黯兽、Harbor 的涡流和水浪。Omen 弹速采用 20m/s、最长行进 25m；近视场景约 7m 可视范围。Harbor 涡流不要求视线。依据 [11.08](https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-11-08/)、[12.00](https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-12-00/)、[12.02](https://playvalorant.com/en-us/news/game-updates/valorant-patch-notes-12-02/)。它们是专项练习，不代表所有特工的完整技能组。
+Reyna 魔眼已加入统一闪光训练列表，保留持续视线近视：移开视线、掩体遮挡或击毁后解除。近视画面约 7m 可视范围仍为训练近似。
 
 ## 判定实现
 
-移动与碰撞使用不超过 1/240 秒的子步，已知引信、激活、锁定等定时事件精确分割到事件边界；重力自由飞行使用解析位移。线段/AABB 求接触比例，碰撞时刻用于引信，反弹后继续处理剩余子步；重力曲线接触点仍是子步内线性近似。移动允许贴墙滑行。射线从玩家眼睛到实际爆点，中间墙体遮挡普通闪光；Breach 的穿墙施放不等于爆炸效果穿透所有墙。Omen 和 Harbor 范围效果另行处理。场地比例、玩家胶囊和运动加减速仍未用实测标定。
+移动与碰撞使用不超过 1/240 秒的子步，已知引信、激活、锁定等定时事件精确分割到事件边界；重力自由飞行使用解析位移。线段/AABB 求接触比例，碰撞时刻用于引信，反弹后继续处理剩余子步；重力曲线接触点仍是子步内线性近似。移动允许贴墙滑行。射线从玩家眼睛到实际爆点，中间墙体遮挡普通闪光；Breach 的穿墙施放不等于爆炸效果穿透所有墙。场地比例、玩家胶囊和运动加减速仍未用实测标定。
 
 可见性采用与 103°、16:9 相机一致的矩形视锥。桌面反应时钟从该技能首次被提交绘制起计，不把未显示的模拟子步算作用户已看见；仍无法测量显示器实际亮起时刻。转身达到 8° 或移动 0.2m 的时间作为动作反应，属于训练统计口径。输入事件先推进到当前时刻，再更新朝向，避免把新朝向用于过去的模拟时刻。闪屏每个显示帧刷新；超过 100ms 的主线程卡顿会暂停，避免静默丢时间。
 

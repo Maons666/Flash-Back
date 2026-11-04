@@ -113,47 +113,5 @@ export const OFFICIAL_ASSETS = {
       }
     ],
     "page": "https://playvalorant.com/en-us/agents/reyna/"
-  },
-  "omen": {
-    "portrait": "assets/official/omen-portrait.png",
-    "abilities": [
-      {
-        "key": "flash",
-        "title": "PARANOIA",
-        "icon": "assets/official/omen-flash.png",
-        "video": "assets/official/omen-flash.mp4"
-      }
-    ],
-    "page": "https://playvalorant.com/en-us/agents/omen/"
-  },
-  "fade": {
-    "portrait": "assets/official/fade-portrait.png",
-    "abilities": [
-      {
-        "key": "flash",
-        "title": "PROWLER",
-        "icon": "assets/official/fade-flash.png",
-        "video": "assets/official/fade-flash.mp4"
-      }
-    ],
-    "page": "https://playvalorant.com/en-us/agents/fade/"
-  },
-  "harbor": {
-    "portrait": "assets/official/harbor-portrait.png",
-    "abilities": [
-      {
-        "key": "flash",
-        "title": "STORM SURGE",
-        "icon": "assets/official/harbor-flash.png",
-        "video": "assets/official/harbor-flash.mp4"
-      },
-      {
-        "key": "wave",
-        "title": "RECKONING",
-        "icon": "assets/official/harbor-wave.png",
-        "video": "assets/official/harbor-wave.mp4"
-      }
-    ],
-    "page": "https://playvalorant.com/en-us/agents/harbor/"
   }
 };

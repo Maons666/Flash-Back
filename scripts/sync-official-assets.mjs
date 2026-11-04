@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 const root=resolve(import.meta.dirname,'..'),out=resolve(root,'public/assets/official');
 await mkdir(out,{recursive:true});
 let previous={};try{previous=JSON.parse(await readFile(resolve(out,'manifest.json'),'utf8'));}catch{}
-const ids={hush:['hush',/flashbulb/i],phoenix:['phoenix',/curveball/i],breach:['breach',/flashpoint/i],skye:['skye',/guiding light/i],kayo:['kay-o',/flash.?drive/i],yoru:['yoru',/blindside|fakeout/i],vyse:['vyse',/arc rose/i],gekko:['gekko',/dizzy/i],reyna:['reyna',/leer/i],omen:['omen',/paranoia/i],fade:['fade',/prowler/i],harbor:['harbor',/storm surge|reckoning/i]};
+const ids={hush:['hush',/flashbulb/i],phoenix:['phoenix',/curveball/i],breach:['breach',/flashpoint/i],skye:['skye',/guiding light/i],kayo:['kay-o',/flash.?drive/i],yoru:['yoru',/blindside|fakeout/i],vyse:['vyse',/arc rose/i],gekko:['gekko',/dizzy/i],reyna:['reyna',/leer/i]};
 function data(html){const m=html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);if(!m)throw Error('Official page data missing');return JSON.parse(m[1]);}
 function collect(o,predicate,result=[]){if(!o||typeof o!=='object')return result;if(predicate(o))result.push(o);for(const v of Object.values(o))collect(v,predicate,result);return result;}
 async function get(url){const r=await fetch(url,{signal:AbortSignal.timeout(60000)});if(!r.ok)throw Error(`${r.status}: ${url}`);return r;}

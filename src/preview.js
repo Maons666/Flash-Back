@@ -32,9 +32,9 @@ export class TechniquePreview {
     this.duration=Math.max(3,(Number.isFinite(this.game.threat.fuse)?this.game.threat.fuse:4)+this.game.threat.duration+.6);
     this.time=0;this.shot=false;this.playing=true;this.el('preview-timeline').max=this.duration;
     this.el('preview-title').textContent=`${agent.name} · ${variant.name}`;
-    const assets=OFFICIAL_ASSETS[agent.id],key=variant.id==='clone'?'clone':(variant.mechanic||variant.id)==='wave'&&agent.id==='harbor'?'wave':'flash';
+    const assets=OFFICIAL_ASSETS[agent.id],key=variant.id==='clone'?'clone':'flash';
     const ability=assets?.abilities?.find(v=>v.key===key)||assets?.abilities?.[0];
-    this.el('reference-video').hidden=!ability;this.el('reference-note').textContent=ability?'官方原版演示，已保存在本地。演示可能早于当前补丁，用于对比外观和动作，不用于读取现版本时长。':'当前没有可核实的官方演示文件。';
+    this.el('reference-video').hidden=!ability;this.el('reference-note').textContent=ability?'官方演示（离线）。旧版本画面仅供外观、动作参考。':'当前没有可核实的官方演示文件。';
     if(ability)this.el('reference-video').src='./'+ability.video;
     this.updateControls();let last=performance.now();
     const frame=now=>{

@@ -1,7 +1,7 @@
 @echo off
 cd /d "%~dp0"
-if exist "release\FlashDodger-v0.10.1\FlashDodger.exe" (
-  start "" "release\FlashDodger-v0.10.1\FlashDodger.exe"
+if exist "release\FlashDodger-v0.10.2\FlashDodger.exe" (
+  start "" "release\FlashDodger-v0.10.2\FlashDodger.exe"
   exit /b 0
 )
 where node >nul 2>nul

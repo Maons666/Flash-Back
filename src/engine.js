@@ -40,7 +40,6 @@ export class Trainer {
     const t=this.threat;
     if(!t||t.dead||t.resolved||!t.visible||t.seenAt!==null)return;
     const points=[t.position];
-    if(t.agent.id==='harbor'&&t.mechanic==='surge')for(let i=0;i<16;i++){const angle=i*Math.PI/8;points.push(add(t.position,[Math.cos(angle)*3.38,0,Math.sin(angle)*3.38]));}
     if(points.some(point=>!occluded(this.player,point,this.map.boxes)&&inView(this.player,point,this.yaw,this.pitch))) {
       t.seenAt=this.time;t.initialLook=forward(this.yaw,this.pitch);t.initialPlayer=[...this.player];
     }
@@ -58,7 +57,7 @@ export class Trainer {
     if(['breach','vyse'].includes(agent.id)) {
       const hit=trace(this.player,add(this.player,scale(normalize(sub(anchor,this.player)),35)),this.map.boxes);
       if(hit)source=add(hit.point,scale(hit.normal,.08));
-    } else if(agent.id!=='omen'&&!(agent.id==='harbor'&&variant.id==='wave')) {
+    } else {
       const hit=trace(this.player,anchor,this.map.boxes);
       if(hit)source=lerp(this.player,hit.point,.78);
     }
@@ -73,9 +72,6 @@ export class Trainer {
     if(agent.id==='yoru'&&variant.id==='clone'){t.position[1]=.9;t.stage='clone';t.fuse=Infinity;t.timeout=4;t.health=1;}
     if(agent.id==='gekko'){t.position[1]=2.8;t.stage='deploy';t.fuse=Infinity;t.health=1;t.activeAt=timing.windup;t.expires=t.activeAt+1;}
     if(agent.id==='reyna'){t.stage='eye';t.health=2;t.fuse=Infinity;t.expires=timing.duration;t.exposed=0;}
-    if(agent.id==='omen'||(agent.id==='harbor'&&variant.id==='wave')){t.velocity=scale(normalize(sub(this.player,t.position)),agent.id==='omen'?20:10);t.fuse=Infinity;t.stage='wave';t.maxTravel=agent.id==='omen'?25:35;}
-    if(agent.id==='fade'){t.position[1]=.65;t.health=3;t.fuse=Infinity;t.stage='chase';t.expires=4;}
-    if(agent.id==='harbor'&&(variant.mechanic||variant.id)==='surge'){t.position=add(this.player,scale(dir,1.2));t.position[1]=.05;}
     planThreat(t,this);
     this.emit({type:'spawn',threat:t});
   }
@@ -106,7 +102,6 @@ export class Trainer {
       const f=forward(this.yaw),r=[-f[2],0,f[0]];
       const walk=this.keys.has('ShiftLeft')||this.keys.has('ShiftRight'), crouch=this.keys.has('ControlLeft');
       let speed=crouch?2.1:walk?3.5:5.4;
-      if(this.effect?.slow&&this.effect.until>this.time)speed*=.7;
       let move=add(scale(f,Number(this.keys.has('KeyW'))-Number(this.keys.has('KeyS'))),scale(r,Number(this.keys.has('KeyD'))-Number(this.keys.has('KeyA'))));
       move=scale(normalize(move),speed*dt);this.player=movePlayer(this.player,move,this.map.boxes);
       this.player[1]=crouch?1.05:1.65;this.trackReaction();
@@ -179,19 +174,6 @@ export class Trainer {
       else if(this.effect?.source==='reyna')this.effect=null;
       if(t.age+1e-9>=t.expires){this.finish(t,{outcome:t.exposed<.25?'evaded':'hit',success:t.exposed<.25,label:t.exposed<.25?'避开魔眼':'持续近视',duration:t.exposed,angle:0,noAfterEffect:true});return;}
     }
-    if(t.stage==='wave') {
-      if(t.age>t.timing.windup+1e-9){
-        t.position=add(t.position,scale(t.velocity,dt));t.travel+=Math.hypot(...t.velocity)*dt;
-        const closest=lerp(before,t.position,clamp(dot(sub(this.player,before),sub(t.position,before))/(distance(before,t.position)**2||1),0,1));
-        if(distance(closest,this.player)<(agent.id==='harbor'?2.6:1.5)){this.finish(t,{outcome:'hit',success:false,label:'被近视命中',duration:t.duration,angle:0,effect:'near',slow:agent.id==='harbor'});return;}
-        if(t.travel>t.maxTravel){this.finish(t,{outcome:'evaded',success:true,label:'躲开弹道',duration:0,angle:0});return;}
-      }
-    }
-    if(agent.id==='fade') {
-      if(t.age>t.timing.windup+1e-9){const next=add(t.position,scale(normalize(sub([this.player[0],.65,this.player[2]],t.position)),7*dt));t.position=movePlayer(t.position,sub(next,t.position),this.map.boxes,.3);}
-      if(distance(t.position,[this.player[0],.65,this.player[2]])<.7){this.finish(t,{outcome:'hit',success:false,label:'黯兽扑咬',duration:t.duration,angle:0,effect:'near'});return;}
-      if(t.age>=t.expires){this.finish(t,{outcome:'evaded',success:true,label:'避开黯兽',duration:0,angle:0});return;}
-    }
     if(!this.presentationTiming)this.markPresented();
     if(t.age+1e-9>=t.fuse&&!t.resolved)this.detonate(t);
     if(!t.trail.length||distance(t.trail.at(-1).position,t.position)>.06)t.trail.push({position:[...t.position],at:t.age});
@@ -236,10 +218,6 @@ export class Trainer {
   }
   detonate(t,at=this.time) {
     if(t.resolved)return;
-    if(t.agent.id==='harbor') {
-      const hit=Math.hypot(this.player[0]-t.position[0],this.player[2]-t.position[2])<3.5;
-      this.finish(t,{outcome:hit?'hit':'evaded',success:!hit,label:hit?'涡流命中':'离开涡流',duration:hit?t.duration:0,angle:0,effect:'near',slow:hit});return;
-    }
     const angle=angleTo(forward(this.yaw,this.pitch),this.player,t.position),blocked=occluded(this.player,t.position,this.map.boxes);
     const inCone=t.variant.id!=='clone'||dot(normalize(sub(this.player,t.position)),t.coneDirection||[0,0,1])>.5;
     const range=distance(this.player,t.position),exposure=flashExposure(angle,t.duration,blocked||!inCone,range,t.timing.profile);
@@ -251,7 +229,7 @@ export class Trainer {
   shoot() {
     if(!this.running||this.time-this.lastShot<.14)return false;this.lastShot=this.time;
     this.emit({type:'shot'});const t=this.threat;if(!t||t.dead||t.resolved)return false;
-    const shootable=t.health>0&&(['vyse','gekko','reyna','fade'].includes(t.agent.id)||(t.agent.id==='yoru'&&t.stage==='clone'));
+    const shootable=t.health>0&&(['vyse','gekko','reyna'].includes(t.agent.id)||(t.agent.id==='yoru'&&t.stage==='clone'));
     if(!shootable)return false;
     const angle=angleTo(forward(this.yaw,this.pitch),this.player,t.position),radius=t.stage==='clone'?.65:.4;
     const blocked=occluded(this.player,t.position,this.map.boxes);

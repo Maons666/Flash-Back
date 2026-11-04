@@ -193,11 +193,5 @@ export function planThreat(t,game){
   if(agent.id==='reyna'){
     t.position[1]=variant.id==='high'?3.5:variant.id==='low'?.5:1.8;t.eyeTarget=[...t.position];t.eyeStart=add(t.position,scale(dir,3));t.position=[...t.eyeStart];
   }
-  if(['omen','fade'].includes(agent.id)&&variant.id==='cross'){
-    t.position=add(player,add(scale(dir,8),scale(right,side*7)));t.position[1]=agent.id==='fade'?.65:1.65;
-    if(agent.id==='omen')t.velocity=scale(normalize(sub(add(player,scale(dir,1)),t.position)),20);
-    else t.position=freePoint(t.position,boxes,[player[0],.65,player[2]],.35);
-  }
-  if(agent.id==='harbor'&&variant.id==='surge-lead')t.position=add(t.position,scale(dir,3));
   t.launchPosition=[...t.position];t.launchTarget=[...player];t.trail=[{position:[...t.position],at:0}];t.history=[[...t.position]];
 }

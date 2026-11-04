@@ -88,14 +88,6 @@
       "duration": 0.25,
       "kind": "official-demonstration-audio-excerpt",
       "sha256": "9f1e5b81e5b0ea5e9fd2df05b76fc16b7a5d3d50baddcef8793489920b396e62"
-    },
-    {
-      "path": "assets/official/fade-spawn.ogg",
-      "source": "https://cmsassets.rgpub.io/sanity/files/dsfx7636/game_data/d401c0074081fd609fa08710174f27fc216c5b92.mp4?accountingTag=VAL",
-      "start": 1.2,
-      "duration": 0.3,
-      "kind": "official-demonstration-audio-excerpt",
-      "sha256": "3bbfd1f935ecdb6e69009b029649de83e38e2e35ec74f89c699959ced99be36c"
     }
   ]
 }

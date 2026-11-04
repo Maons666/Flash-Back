@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 const manifest=JSON.parse(await readFile('public/assets/official/manifest.json','utf8'));
 // Short excerpts of Riot's public demonstrations, NOT isolated game sound-bank files.
 // These timestamps are reference editing decisions, not ability timing parameters.
-const cuts={hush:{spawn:[2.05,.28],redirect:[3.55,.24],result:[6.9,.38]},phoenix:{spawn:[1.55,.2],result:[2.2,.28]},breach:{spawn:[3.5,.3],result:[4.1,.35]},skye:{spawn:[1.4,.25],activate:[3.45,.22],result:[3.7,.32]},kayo:{telegraph:[5.1,.22],result:[5.4,.32]},yoru:{bounce:[.8,.22],result:[1.35,.3]},vyse:{activate:[4.85,.3],result:[5.25,.38]},gekko:{spawn:[5.95,.22],lock:[7.4,.25]},reyna:{spawn:[1,.32]},omen:{spawn:[1.3,.4]},fade:{spawn:[1.2,.3]},harbor:{spawn:[1.4,.3]}};
+const cuts={hush:{spawn:[2.05,.28],redirect:[3.55,.24],result:[6.9,.38]},phoenix:{spawn:[1.55,.2],result:[2.2,.28]},breach:{spawn:[3.5,.3],result:[4.1,.35]},skye:{spawn:[1.4,.25],activate:[3.45,.22],result:[3.7,.32]},kayo:{telegraph:[5.1,.22],result:[5.4,.32]},yoru:{bounce:[.8,.22],result:[1.35,.3]},vyse:{activate:[4.85,.3],result:[5.25,.38]},gekko:{spawn:[5.95,.22],lock:[7.4,.25]},reyna:{spawn:[1,.32]}};
 const sounds={};const provenance=[];
 for(const [id,events] of Object.entries(cuts)){
   const video=manifest.agents[id]?.abilities?.find(v=>v.key==='flash')?.video;if(!video)continue;

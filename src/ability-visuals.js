@@ -64,19 +64,6 @@ export function makeAbilityVisual(t){
     sphere(root,mat('#f3a3e8','#f473e4',1.3),[0,0,-.15],[.17,.2,.035]);sphere(root,dark,[0,0,-.19],[.035,.15,.02]);
     for(let i=0;i<10;i++){const a=i*Math.PI/5;const f=leaf(root,violet,.4,.03,[Math.sin(a)*.21,Math.cos(a)*.21,.01],-a);animated.push(f);}
     halo=aura(root,'#c439e5',1.6,.6);
-  }else if(id==='fade'){
-    const skin=mat('#374052','#604c7e',.4),eye=mat('#e6c474','#ffbe5a',1.8);
-    sphere(root,skin,[0,0,0],[.25,.18,.46]);sphere(root,skin,[0,.08,-.35],[.28,.2,.2]);
-    for(const s of [-1,1]){sphere(root,eye,[s*.15,.13,-.5],[.065,.035,.025]);for(const z of [-.25,.25]){const leg=box(root,skin,[s*.3,-.12,z],[.09,.24,.1]);leg.rotation.z=s*.6;animated.push(leg);}}
-    halo=aura(root,'#8696b0',1.1,.2);
-  }else if(id==='harbor'){
-    if(t.mechanic==='surge'){
-      for(let i=0;i<4;i++){const r=ring(root,i%2?'#e0c087':'#7ccece',.8+i*.86,.035);r.rotation.x=Math.PI/2;animated.push(r);}
-    }else {for(let i=0;i<5;i++){const r=ring(root,'#62d7cf',.5+i*.45,.04);animated.push(r);}}
-    halo=aura(root,'#80dad6',2,.3);
-  }else if(id==='omen'){
-    for(let i=0;i<8;i++){const r=ring(root,i%2?'#354373':'#887bba',.3+i*.14,.055);r.rotation.set(i*.31,i*.4,i*.7);animated.push(r);}
-    sphere(root,mat('#181c32','#353353',.5),[0,0,0],[.9,.9,.9]);halo=aura(root,'#615fb1',2.5,.5);
   }else if(id==='hush'){
     const frame=mat('#27252d','#6d2359',.12),edge=mat('#827181','#b368a3',.28),bulb=mat('#bd34bd','#ff56e5',2);
     part(root,new THREE.OctahedronGeometry(.13,1),bulb,[0,0,0],[.75,1.5,.75]);
@@ -116,7 +103,7 @@ export function makeAbilityVisual(t){
       root.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),new THREE.Vector3(...(threat.normal||[0,0,1])));
       const dormant=threat.stage==='dormant';halo.material.opacity=dormant?.12:.5+Math.sin(age*32)*.2;
       root.scale.setScalar(dormant?.75:1+Math.max(0,.4-remaining)*.6);
-    }else if(['gekko','fade'].includes(id)){
+    }else if(id==='gekko'){
       root.lookAt(new THREE.Vector3(...threat.initialPlayer));root.rotateY(Math.PI);
       if(id==='gekko')root.position.y+=Math.sin(age*7)*.035;
     }else if(id==='hush'){root.rotation.set(Math.sin(age*5)*.4,age*3,Math.sin(age*4)*.25);halo.material.opacity=.48+Math.sin(age*34)*.12;}

@@ -19,8 +19,5 @@ export const OFFICIAL_SOUNDS={
   "gekko": {
     "spawn": "assets/official/gekko-spawn.ogg",
     "lock": "assets/official/gekko-lock.ogg"
-  },
-  "fade": {
-    "spawn": "assets/official/fade-spawn.ogg"
   }
 };
